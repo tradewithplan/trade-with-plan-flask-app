@@ -142,21 +142,36 @@
         <main>
              <!-- Flash Messages -->
             {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    <div class="container mx-auto px-6 pt-4">
-                    {% for category, message in messages %}
-                        <div class="p-4 mb-4 text-sm rounded-lg
-                            {% if category == 'success' %} bg-green-900 text-green-300
-                            {% elif category == 'error' %} bg-red-900 text-red-300
-                            {% elif category == 'warning' %} bg-yellow-900 text-yellow-300
-                            {% else %} bg-blue-900 text-blue-300 {% endif %}"
-                            role="alert">
-                            {{ message }}
-                        </div>
-                    {% endfor %}
+              {% if messages %}
+                <div id="flash-messages-container" class="container mx-auto px-6 pt-4">
+                  {% for category, message in messages %}
+                    {# 
+                      - Added 'flex', 'justify-between', and 'items-center' to position the message and button.
+                      - Added a 'flash-message' class for easy targeting with JavaScript.
+                    #}
+                    <div class="flash-message flex justify-between items-center p-4 mb-4 text-sm rounded-lg 
+                      {% if category == 'success' %} bg-green-900 text-green-300
+                      {% elif category == 'error' %} bg-red-900 text-red-300
+                      {% elif category == 'warning' %} bg-yellow-900 text-yellow-300
+                      {% else %} bg-blue-900 text-blue-300 {% endif %}"
+                      role="alert">
+                      
+                      {# The message content #}
+                      <span>{{ message }}</span>
+
+                      {# 
+                        - This is the close button.
+                        - The 'data-dismiss-target' is a custom attribute we'll use in JS to find the button.
+                      #}
+                      <button type="button" class="ml-auto -mx-1.5 -my-1.5 bg-transparent text-current rounded-lg focus:ring-2 focus:ring-gray-400 p-1.5 hover:bg-gray-800/50 inline-flex h-8 w-8" data-dismiss-target>
+                        <span class="sr-only">Dismiss</span>
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                      </button>
                     </div>
-                {% endif %}
-            {% endwith %}
+                  {% endfor %}
+                </div>
+              {% endif %}
+            {% endwith %}            
 
             <!-- Hero Section -->
             <section class="container mx-auto px-6 py-24 md:py-32 text-center">
@@ -674,6 +689,41 @@
         </footer>
 
     </div>
+    <script>
+      // Function to handle the dismissal of a flash message
+      function dismissMessage(element) {
+        if (!element) return;
+        
+        // Add a fade-out effect using Tailwind CSS transition classes
+        element.style.transition = 'opacity 0.5s ease-out';
+        element.style.opacity = '0';
+
+        // Wait for the transition to complete before removing the element from the DOM
+        setTimeout(() => {
+          element.remove();
+        }, 500); // 500ms matches the transition duration
+      }
+
+      // Find all flash messages on the page
+      const flashMessages = document.querySelectorAll('.flash-message');
+
+      flashMessages.forEach(message => {
+        // Find the close button within each message
+        const closeButton = message.querySelector('[data-dismiss-target]');
+        
+        // Add a click event listener to the close button
+        if (closeButton) {
+          closeButton.addEventListener('click', () => {
+            dismissMessage(message);
+          });
+        }
+
+        // Set a timeout to automatically dismiss the message after 5 seconds
+        setTimeout(() => {
+          dismissMessage(message);
+        }, 5000); // 5000 milliseconds = 5 seconds
+      });
+    </script>
 
 </body>
 </html>
