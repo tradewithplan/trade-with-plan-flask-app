@@ -108,19 +108,23 @@ def login_required(f):
 # ---------- Routes ----------
 
 @app.route('/')
-@login_required
 def home():
     """
-    Displays the home page and fetches the user's purchased courses.
+    Displays the home page.
+    Fetches purchased courses ONLY if the user is logged in.
     """
-    cur = get_db()
-    # 4. Fetch the list of courses the user has purchased
-    cur.execute("SELECT course_name FROM purchases WHERE user_id = %s", (session['user_id'],))
-    purchased_courses_rows = cur.fetchall()
-    # Convert list of row objects to a simple list of strings
-    purchased_courses = [row['course_name'] for row in purchased_courses_rows]
+    purchased_courses = [] # Default to an empty list for guests
+    
+    # Check if a user is logged in
+    if 'user_id' in session:
+        cur = get_db()
+        # Fetch the list of courses the user has purchased
+        cur.execute("SELECT course_name FROM purchases WHERE user_id = %s", (session['user_id'],))
+        purchased_courses_rows = cur.fetchall()
+        # Convert list of row objects to a simple list of strings
+        purchased_courses = [row['course_name'] for row in purchased_courses_rows]
 
-    # Pass the list of purchased courses to the template
+    # Pass the list (either empty or populated) to the template
     return render_template('index.html', purchased_courses=purchased_courses)
 
 
@@ -182,7 +186,8 @@ def login():
 def logout():
     session.clear()
     flash("You have been logged out.", "success")
-    return redirect(url_for('login'))
+    # Redirect to the public home page instead of the login page
+    return redirect(url_for('home')) 
 
 
 # Flask-Mail configuration
@@ -285,7 +290,6 @@ def purchase(course_name):
         flash(f"An error occurred during purchase: {e}", "error")
 
     return redirect(url_for('home'))
-
 
 @app.route('/course1')
 def course1():
