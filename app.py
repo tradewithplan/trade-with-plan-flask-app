@@ -1,11 +1,19 @@
 # 1. Import necessary libraries
+
+# Standard library imports
 import os
+from functools import wraps
+from datetime import datetime
+
+# Third-party library imports
+from flask import Flask, render_template, request, redirect, session, url_for, g, flash
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+from flask_mail import Mail, Message
+from werkzeug.security import generate_password_hash, check_password_hash
 import psycopg2
 import psycopg2.extras  # Needed to access columns by name
-from flask import Flask, render_template, request, redirect, session, url_for, g, flash
-from werkzeug.security import generate_password_hash, check_password_hash
-from functools import wraps
 from dotenv import load_dotenv
+
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -176,27 +184,90 @@ def logout():
     return redirect(url_for('login'))
 
 
+# Flask-Mail configuration
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+# Use environment variables for sensitive data in production
+app.config['MAIL_USERNAME'] = os.environ.get('EMAIL_USER') # Your email address
+app.config['MAIL_PASSWORD'] = os.environ.get('EMAIL_PASS') # Your App Password
+# ADD THIS LINE for the admin's email
+app.config['ADMIN_EMAIL'] = os.environ.get('ADMIN_EMAIL')
+
+# Initialize the Mail instance
+mail = Mail(app)
+
 # 5. New route to handle course purchases
 @app.route('/purchase/<string:course_name>', methods=['POST'])
 @login_required
 def purchase(course_name):
     """
-    Handles the logic for purchasing a course.
+    Handles the logic for purchasing a course and sends confirmation emails
+    to both the user and the admin.
     """
     try:
         cur = get_db()
-        # Insert the purchase record into the database
         cur.execute("INSERT INTO purchases (user_id, course_name) VALUES (%s, %s)",
                     (session['user_id'], course_name))
         cur.connection.commit()
         flash(f"Successfully purchased the '{course_name}' course!", "success")
+
+        # --- Email Sending Logic ---
+        try:
+            # 1. Fetch user's name and email from the database
+            cur.execute("SELECT name, email FROM users WHERE id = %s", (session['user_id'],))
+            user = cur.fetchone()
+
+            if user:
+                # --- Part A: Send Confirmation Email to the USER ---
+                user_subject = f"Purchase Confirmation: {course_name}"
+                msg_user = Message(user_subject, sender=app.config['MAIL_USERNAME'], recipients=[user['email']])
+                msg_user.html = f"""
+                <html>
+                    <body>
+                        <h2>Thank You for Your Purchase!</h2>
+                        <p>Hi {user['name']},</p>
+                        <p>You have successfully purchased the <strong>{course_name}</strong> course. You can now access all course materials from your dashboard.</p>
+                        <p>Happy learning!</p>
+                        <p><em>The Trade with Plan Team</em></p>
+                    </body>
+                </html>
+                """
+                mail.send(msg_user)
+
+                # --- Part B: Send Notification Email to the ADMIN/MENTOR ---
+                admin_subject = f"New Course Sale: '{course_name}' by {user['name']}"
+                purchase_time = datetime.now().strftime('%d %b %Y, %I:%M %p IST')
+                
+                msg_admin = Message(admin_subject, sender=app.config['MAIL_USERNAME'], recipients=[app.config['ADMIN_EMAIL']])
+                msg_admin.html = f"""
+                <html>
+                    <body>
+                        <h2>New Course Purchase Alert!</h2>
+                        <p>A course was just purchased on Trade with Plan. Here are the details:</p>
+                        <ul>
+                            <li><strong>User Name:</strong> {user['name']}</li>
+                            <li><strong>User Email:</strong> {user['email']}</li>
+                            <li><strong>Course Purchased:</strong> {course_name}</li>
+                            <li><strong>Time of Purchase:</strong> {purchase_time}</li>
+                            <li><strong>User ID:</strong> {session['user_id']}</li>
+                        </ul>
+                    </body>
+                </html>
+                """
+                mail.send(msg_admin)
+
+        except Exception as e:
+            app.logger.error(f"Email sending failed for user {session['user_id']}: {e}")
+            flash("Purchase successful, but we failed to send confirmation emails. Please contact support.", "warning")
+            
     except psycopg2.errors.UniqueViolation:
-        # This prevents a user from buying the same course twice
+        get_db().connection.rollback()
         flash("You have already purchased this course.", "info")
-        get_db().connection.rollback()
+        
     except Exception as e:
-        flash(f"An error occurred: {e}", "error")
         get_db().connection.rollback()
+        flash(f"An error occurred during purchase: {e}", "error")
 
     return redirect(url_for('home'))
 
