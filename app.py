@@ -215,7 +215,8 @@ def purchase(course_name):
         # --- Email Sending Logic ---
         try:
             # 1. Fetch user's name and email from the database
-            cur.execute("SELECT name, email FROM users WHERE id = %s", (session['user_id'],))
+            # CORRECTED: Use 'fullname' to match your database schema
+            cur.execute("SELECT fullname, email FROM users WHERE id = %s", (session['user_id'],))
             user = cur.fetchone()
 
             if user:
@@ -226,7 +227,7 @@ def purchase(course_name):
                 <html>
                     <body>
                         <h2>Thank You for Your Purchase!</h2>
-                        <p>Hi {user['name']},</p>
+                        <p>Hi {user['fullname']},</p>
                         <p>You have successfully purchased the <strong>{course_name}</strong> course. You can now access all course materials from your dashboard.</p>
                         <p>Happy learning!</p>
                         <p><em>The Trade with Plan Team</em></p>
@@ -236,7 +237,8 @@ def purchase(course_name):
                 mail.send(msg_user)
 
                 # --- Part B: Send Notification Email to the ADMIN/MENTOR ---
-                admin_subject = f"New Course Sale: '{course_name}' by {user['name']}"
+                # CORRECTED: Use the 'fullname' key
+                admin_subject = f"New Course Sale: '{course_name}' by {user['fullname']}"
                 purchase_time = datetime.now().strftime('%d %b %Y, %I:%M %p IST')
                 
                 msg_admin = Message(admin_subject, sender=app.config['MAIL_USERNAME'], recipients=[app.config['ADMIN_EMAIL']])
@@ -246,7 +248,7 @@ def purchase(course_name):
                         <h2>New Course Purchase Alert!</h2>
                         <p>A course was just purchased on Trade with Plan. Here are the details:</p>
                         <ul>
-                            <li><strong>User Name:</strong> {user['name']}</li>
+                            <li><strong>User Name:</strong> {user['fullname']}</li>
                             <li><strong>User Email:</strong> {user['email']}</li>
                             <li><strong>Course Purchased:</strong> {course_name}</li>
                             <li><strong>Time of Purchase:</strong> {purchase_time}</li>
