@@ -208,7 +208,6 @@ mail = Mail(app)
 from datetime import datetime
 import pytz
 
-# ... your other imports
 
 @app.route('/purchase/<string:course_name>', methods=['POST'])
 @login_required
