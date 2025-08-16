@@ -323,7 +323,13 @@
                     <!-- Purchase Button Logic -->
                     {% if 'ICT "Forever Model"' in purchased_courses %}
                         <button class="w-full bg-green-600 text-white font-bold py-3 rounded-lg mt-auto cursor-not-allowed" disabled>Purchased</button>
-                        <a href="{{ url_for('course1') }}" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg mt-auto text-center transition-colors cta-buy-button">
+                        <div class="flex w-full cursor-default items-center justify-center gap-2 rounded-lg bg-gradient-to-br from-amber-300 via-yellow-400 to-amber-500 py-3 font-bold text-amber-900 shadow-lg shadow-yellow-500/30 mt-auto">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                          </svg>
+                          <span>Purchased</span>
+                        </div>
+                        <a href="{{ url_for('course1') }}" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-lg transition-colors cta-buy-button">
                             View Course
                         </a>
                     {% else %}
@@ -350,6 +356,15 @@
                     <!-- Purchase Button Logic -->
                     {% if 'Basic to Advanced' in purchased_courses %}
                         <button class="w-full bg-green-600 text-white font-bold py-3 rounded-lg mt-auto cursor-not-allowed" disabled>Purchased</button>
+                        <div class="flex w-full cursor-default items-center justify-center gap-2 rounded-lg bg-gradient-to-br from-amber-300 via-yellow-400 to-amber-500 py-3 font-bold text-amber-900 shadow-lg shadow-yellow-500/30 mt-auto">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                          </svg>
+                          <span>Purchased</span>
+                        </div>
+                        <a href="{{ url_for('course1') }}" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-lg transition-colors cta-buy-button">
+                            View Course
+                        </a>
                     {% else %}
                         <form action="{{ url_for('purchase', course_name='Basic to Advanced') }}" method="post" class="mt-auto">
                             <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-lg transition-colors cta-buy-button">Choose Plan</button>
@@ -374,6 +389,15 @@
                      <!-- Purchase Button Logic -->
                     {% if '1-1 Personal Mentorship' in purchased_courses %}
                         <button class="w-full bg-green-600 text-white font-bold py-3 rounded-lg mt-auto cursor-not-allowed" disabled>Purchased</button>
+                        <div class="flex w-full cursor-default items-center justify-center gap-2 rounded-lg bg-gradient-to-br from-amber-300 via-yellow-400 to-amber-500 py-3 font-bold text-amber-900 shadow-lg shadow-yellow-500/30 mt-auto">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                          </svg>
+                          <span>Purchased</span>
+                        </div>
+                        <a href="{{ url_for('course1') }}" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-lg transition-colors cta-buy-button">
+                            View Course
+                        </a>
                     {% else %}
                         <form action="{{ url_for('purchase', course_name='1-1 Personal Mentorship') }}" method="post" class="mt-auto">
                            <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-lg transition-colors cta-buy-button">Choose Plan</button>
