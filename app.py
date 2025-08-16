@@ -201,6 +201,11 @@ def purchase(course_name):
     return redirect(url_for('home'))
 
 
+@app.route('/course1')
+def course1():
+    return render_template('course1.html')
+
+
 if __name__ == '__main__':
     init_db()
     app.run(debug=True)

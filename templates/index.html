@@ -5,15 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trade with Plan - Your Gateway to Professional Trading</title>
 
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-    <!-- Alpine.js for interactivity -->
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     <style>
@@ -27,7 +24,7 @@
             background: linear-gradient(90deg, #a78bfa, #6b21a8);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            font-size: inherit;   /* Ensure it’s same as parent */
+            font-size: inherit;  /* Ensure it’s same as parent */
             font-weight: inherit; /* Keep the boldness */
         }
         .cta-button {
@@ -80,38 +77,30 @@
 </head>
 <body class="antialiased">
 
-    <!-- App container -->
     <div x-data="{ mobileMenuOpen: false }" class="min-h-screen">
 
-        <!-- Header / Navigation -->
         <header class="sticky top-0 z-50 bg-black/50 backdrop-blur-lg border-b border-gray-800">
             <nav class="container mx-auto px-6 py-4">
                 <div class="flex items-center justify-between">
-                    <!-- Logo -->
                     <a href="{{ url_for('home') }}" class="flex items-center space-x-3">
                         <span class="text-2xl font-bold">
-                          <span class="text-white">Trade</span><span class="text-purple-600 gradient-text">with</span><span class="text-white">Plan</span>
+                            <span class="text-white">Trade</span><span class="text-purple-600 gradient-text">with</span><span class="text-white">Plan</span>
                         </span>
                     </a>
 
-                    <!-- Desktop Menu -->
                     <div class="hidden md:flex items-center space-x-8">
                         <a href="#features" class="text-gray-300 hover:text-purple-500 transition-colors">Features</a>
                         <a href="#pricing" class="text-gray-300 hover:text-purple-500 transition-colors">Pricing</a>
                         <a href="#testimonials" class="text-gray-300 hover:text-purple-500 transition-colors">Testimonials</a>
 
-                        <!-- User login/logout logic -->
                         {% if 'user_id' in session %}
-                            <!-- If user is logged in, show a styled Logout button -->
                             <a href="{{ url_for('logout') }}" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors">Logout</a>
                         {% else %}
-                            <!-- If no user is logged in, show Login and Sign Up links -->
                             <a href="{{ url_for('login') }}" class="text-gray-300 hover:text-purple-500 transition-colors">Login</a>
                             <a href="{{ url_for('signup') }}" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors">Sign Up</a>
                         {% endif %}
                     </div>
 
-                    <!-- Mobile Menu Button -->
                     <div class="md:hidden">
                         <button @click="mobileMenuOpen = !mobileMenuOpen" class="text-white focus:outline-none">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -121,13 +110,11 @@
                     </div>
                 </div>
 
-                <!-- Mobile Menu -->
                 <div x-show="mobileMenuOpen" @click.away="mobileMenuOpen = false" class="md:hidden mt-4 space-y-4" x-transition>
                     <a href="#features" class="block text-gray-300 hover:text-purple-500 transition-colors">Features</a>
                     <a href="#pricing" class="block text-gray-300 hover:text-purple-500 transition-colors">Pricing</a>
                     <a href="#testimonials" class="block text-gray-300 hover:text-purple-500 transition-colors">Testimonials</a>
 
-                    <!-- Mobile login/logout logic -->
                     {% if 'user_id' in session %}
                         <a href="{{ url_for('logout') }}" class="block bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors text-center">Logout</a>
                     {% else %}
@@ -138,10 +125,8 @@
             </nav>
         </header>
 
-        <!-- Main Content -->
         <main>
-             <!-- Flash Messages -->
-            {% with messages = get_flashed_messages(with_categories=true) %}
+             {% with messages = get_flashed_messages(with_categories=true) %}
               {% if messages %}
                 {# 
                   - This container is now a floating element.
@@ -175,12 +160,10 @@
                   {% endfor %}
                 </div>
               {% endif %}
-            {% endwith %}            
+            {% endwith %}             
 
-            <!-- Hero Section -->
             <section class="container mx-auto px-6 py-24 md:py-32 text-center">
 
-                <!-- User Name Fetch -->
                 {% if 'user_name' in session %}
                     <h2 class="text-3xl md:text-4xl font-extrabold text-white leading-tight mb-4">
                         Welcome back, <span class="gradient-text">{{ session['user_name'] }}</span>!
@@ -204,7 +187,6 @@
                 </div>
             </section>
 
-            <!-- Who is Your Mentor Section -->
             <section id="mentor" class="bg-black py-20">
                 <div class="container mx-auto px-6">
                     <div class="text-center mb-12">
@@ -218,13 +200,11 @@
                     </div>
 
                     <div class="flex flex-col lg:flex-row items-center lg:items-start gap-8 lg:gap-12">
-                        <!-- Mentor Image -->
                         <div class="flex-shrink-0">
                             <img src="{{ url_for('static', filename='mentor.jpg') }}" alt="Mentor Photo"
                                  class="rounded-2xl shadow-xl border border-gray-800 w-48 h-48 sm:w-64 sm:h-64 object-cover mx-auto lg:mx-0">
                         </div>
 
-                        <!-- Mentor Info -->
                         <div class="text-center lg:text-left">
                             <h3 class="text-xl sm:text-2xl mb-3">
                                 <span class="gradient-text font-bold">Naveen Kumar</span>
@@ -258,7 +238,6 @@
                 </div>
             </section>
 
-            <!-- Features Section -->
             <section id="features" class="py-20">
                 <div class="container mx-auto px-6">
                     <div class="text-center mb-12">
@@ -266,7 +245,6 @@
                         <p class="text-gray-400 mt-2">Everything you need to analyze the market and trade effectively.</p>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-                        <!-- Features remain the same -->
                         <div class="feature-card p-8 rounded-lg bg-gray-900">
                             <h3 class="text-2xl font-bold text-white mb-3">Advanced Charting</h3>
                             <p class="text-gray-400">Utilize a full suite of drawing tools, technical indicators, and chart types. Highly customizable to fit your trading style.</p>
@@ -295,7 +273,6 @@
                 </div>
             </section>
 
-            <!-- Pricing Section -->
             <section id="pricing" class="bg-black py-20">
               <div class="container mx-auto px-6">
                 <div class="text-center mb-12">
@@ -307,7 +284,6 @@
 
                 <div class="flex flex-col lg:flex-row justify-center items-stretch gap-8">
 
-                  <!-- Plan 1: ICT “FOREVER MODEL” (Advanced) -->
                   <div data-modal-id="modal-basic" class="feature-card flex flex-col w-full max-w-sm p-8 rounded-xl bg-gray-900 border-2 border-gray-700 hover:scale-105 transition-transform cta-course-card">
                     <h3 class="text-2xl font-bold text-white text-center">ICT “Forever Model”</h3>
                     <p class="text-center text-gray-400 mt-2 mb-6">(Advanced)</p>
@@ -320,9 +296,10 @@
                       <li class="flex items-start"><svg class="w-5 h-5 flex-shrink-0 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Personal Doubt Sessions</li>
                       <li class="flex items-start"><svg class="w-5 h-5 flex-shrink-0 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Free 1-Month Premium Signals (worth $30)</li>
                     </ul>
-                    <!-- Purchase Button Logic -->
                     {% if 'ICT "Forever Model"' in purchased_courses %}
-                        <button class="w-full bg-green-600 text-white font-bold py-3 rounded-lg mt-auto cursor-not-allowed" disabled>Purchased</button>
+                        <a href="{{ url_for('view_course', course_name='ICT \"Forever Model\"') }}" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg mt-auto text-center transition-colors cta-buy-button">
+                            View Course
+                        </a>
                     {% else %}
                         <form action="{{ url_for('purchase', course_name='ICT \"Forever Model\"') }}" method="post" class="mt-auto">
                            <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-lg transition-colors cta-buy-button">Choose Plan</button>
@@ -330,7 +307,6 @@
                     {% endif %}
                   </div>
 
-                  <!-- Plan 2: Advance (Most Popular) -->
                   <div data-modal-id="modal-advance" class="feature-card flex flex-col w-full max-w-sm p-8 rounded-xl bg-gray-900 border-4 border-purple-500 shadow-lg relative hover:scale-105 transition-transform cta-course-card">
                     <span class="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2 bg-purple-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase z-10">Most Popular</span>
                     <h3 class="text-2xl font-bold text-white text-center">Basic to Advanced</h3>
@@ -344,9 +320,10 @@
                       <li class="flex items-start"><svg class="w-5 h-5 flex-shrink-0 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Personal Doubt Sessions</li>
                       <li class="flex items-start"><svg class="w-5 h-5 flex-shrink-0 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Free 1-Month Premium Signals (worth $30)</li>
                     </ul>
-                    <!-- Purchase Button Logic -->
                     {% if 'Basic to Advanced' in purchased_courses %}
-                        <button class="w-full bg-green-600 text-white font-bold py-3 rounded-lg mt-auto cursor-not-allowed" disabled>Purchased</button>
+                        <a href="{{ url_for('view_course', course_name='Basic to Advanced') }}" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg mt-auto text-center transition-colors cta-buy-button">
+                            View Course
+                        </a>
                     {% else %}
                         <form action="{{ url_for('purchase', course_name='Basic to Advanced') }}" method="post" class="mt-auto">
                             <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-lg transition-colors cta-buy-button">Choose Plan</button>
@@ -354,7 +331,6 @@
                     {% endif %}
                   </div>
 
-                  <!-- Plan 3: 1-1 Personal Mentorship -->
                   <div data-modal-id="modal-pro" class="feature-card flex flex-col w-full max-w-sm p-8 rounded-xl bg-gray-900 border-2 border-gray-700 hover:scale-105 transition-transform cta-course-card">
                     <h3 class="text-2xl font-bold text-white text-center">1-1 Personal Mentorship</h3>
                     <p class="text-center text-gray-400 mt-2 mb-6">(Only <span class="font-bold">2 Slots</span> per month)</p>
@@ -368,9 +344,10 @@
                         <li class="flex items-start"><svg class="w-5 h-5 flex-shrink-0 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Personal Doubt Clearing Sessions</li>
                         <li class="flex items-start"><svg class="w-5 h-5 flex-shrink-0 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Free Premium Signal Group</li>
                     </ul>
-                     <!-- Purchase Button Logic -->
-                    {% if '1-1 Personal Mentorship' in purchased_courses %}
-                        <button class="w-full bg-green-600 text-white font-bold py-3 rounded-lg mt-auto cursor-not-allowed" disabled>Purchased</button>
+                     {% if '1-1 Personal Mentorship' in purchased_courses %}
+                        <a href="{{ url_for('view_course', course_name='1-1 Personal Mentorship') }}" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg mt-auto text-center transition-colors cta-buy-button">
+                            View Course
+                        </a>
                     {% else %}
                         <form action="{{ url_for('purchase', course_name='1-1 Personal Mentorship') }}" method="post" class="mt-auto">
                            <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-lg transition-colors cta-buy-button">Choose Plan</button>
@@ -381,17 +358,9 @@
                 </div>
               </div>
 
-              <!-- Modals -->
-
-              <!-- Course 1: ICT “FOREVER MODEL” (Advanced) -->
               <div id="modal-basic" class="fixed inset-0 bg-black bg-opacity-60 hidden items-center justify-center z-50">
                 <div class="bg-gray-900 rounded-lg w-full max-w-md sm:max-w-lg lg:max-w-2xl relative max-h-[90vh] overflow-hidden
-                            p-8 sm:p-10 md:p-12"> <!-- increased padding -->
-                  <button onclick="closeModal('modal-basic')" class="absolute top-4 right-4 text-white text-3xl">&times;</button> <!-- bigger close button with margin -->
-                  <h2 class="text-2xl font-bold text-white mb-6 gradient-text">ICT “Forever Model” - Course Content</h2> <!-- more bottom margin -->
-
-                  <div class="course-content-scroll max-h-[70vh] overflow-y-auto pr-3 text-gray-300">
-                    <!-- <p class="mb-4">Topics covered:</p> -->
+                             p-8 sm:p-10 md:p-12"> <button onclick="closeModal('modal-basic')" class="absolute top-4 right-4 text-white text-3xl">&times;</button> <h2 class="text-2xl font-bold text-white mb-6 gradient-text">ICT “Forever Model” - Course Content</h2> <div class="course-content-scroll max-h-[70vh] overflow-y-auto pr-3 text-gray-300">
                     <ol class="list-decimal list-inside space-y-2">
                       <li>What is Liquidity BSL, SSL.</li>
                       <li>What is FVG and How to Find the Right FVG.</li>
@@ -406,10 +375,9 @@
                 </div>
               </div>
 
-              <!-- Course 2: BASIC TO ADVANCED (3 ICT MODELS COVERED) -->
               <div id="modal-advance" class="fixed inset-0 bg-black bg-opacity-60 hidden items-center justify-center z-50">
                 <div class="bg-gray-900 rounded-lg w-full max-w-md sm:max-w-lg lg:max-w-2xl relative max-h-[90vh] overflow-hidden
-                            p-8 sm:p-10 md:p-12">
+                             p-8 sm:p-10 md:p-12">
                   <button onclick="closeModal('modal-advance')" class="absolute top-4 right-4 text-white text-3xl">&times;</button>
                   <h2 class="text-2xl font-bold text-white mb-6 gradient-text">Basic to Advanced - Course Content</h2>
 
@@ -468,7 +436,6 @@
                 </div>
               </div>
 
-              <!-- Course 3: Pro Plan -->
               <div id="modal-pro" class="fixed inset-0 bg-black bg-opacity-60 hidden items-center justify-center z-50">
                 <div class="bg-gray-900 rounded-lg w-full max-w-md sm:max-w-lg lg:max-w-2xl relative max-h-[90vh] overflow-hidden p-8 sm:p-10 md:p-12">
                   <button onclick="closeModal('modal-pro')" class="absolute top-4 right-4 text-white text-3xl">&times;</button>
@@ -594,10 +561,14 @@
                             // Check if the click happened on the 'Choose Plan' button or its container form.
                             // The .closest() method checks the clicked element and its parents.
                             const isBuyButton = event.target.closest('.cta-buy-button');
+                            
+                            // Check if the click happened on the "View Course" button.
+                            const isViewButton = event.target.closest('a.cta-buy-button');
 
                             // If the buy button was clicked, do nothing.
                             // This allows the form to submit normally for the purchase action.
-                            if (isBuyButton) {
+                            // If the view button was clicked, also do nothing to allow the link to navigate.
+                            if (isBuyButton || isViewButton) {
                                 return;
                             }
 
@@ -624,14 +595,12 @@
                 });
             </script>
 
-            <!-- The rest of your page content remains the same... -->
             <section id="testimonials" class="py-20">
                 <div class="container mx-auto px-6">
                     <div class="text-center mb-12">
                         <h2 class="text-3xl md:text-4xl font-bold text-white">Trusted by <span class="gradient-text">Traders Worldwide</span></h2>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-                        <!-- Testimonial 1 -->
                         <div class="feature-card p-8 rounded-lg bg-gray-900">
                             <p class="text-gray-300 mb-6">"The charting tools are phenomenal. I can perform my technical analysis faster and more accurately than ever before. A game-changer for my strategy."</p>
                             <div class="flex items-center">
@@ -641,7 +610,6 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- Testimonial 2 -->
                         <div class="feature-card p-8 rounded-lg bg-gray-900">
                             <p class="text-gray-300 mb-6">"I love the clean interface and the dark mode is easy on the eyes during long trading sessions. The platform is incpurpleibly fast and reliable."</p>
                              <div class="flex items-center">
@@ -651,7 +619,6 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- Testimonial 3 -->
                         <div class="feature-card p-8 rounded-lg bg-gray-900">
                             <p class="text-gray-300 mb-6">"As a beginner, the paper trading feature was invaluable. It gave me the confidence to start trading with real money. Highly recommended!"</p>
                              <div class="flex items-center">
@@ -665,7 +632,6 @@
                 </div>
             </section>
 
-            <!-- Contact Us Section -->
             <section id="contact" class="bg-black py-20">
               <div class="container mx-auto px-6 text-center">
                 <h2 class="text-3xl md:text-4xl font-bold mb-4 text-white">Contact Us</h2>
@@ -677,7 +643,6 @@
                   action="https://formsubmit.co/alwysbhpy@gmail.com"
                   method="POST">
 
-                  <!-- FormSubmit settings -->
                   <input type="hidden" name="_captcha" value="false">
                   <input type="hidden" name="_next" value="">
 
@@ -742,7 +707,6 @@
             </script>
         </main>
 
-        <!-- Footer -->
         <footer class="border-t border-gray-800">
             <div class="container mx-auto px-6 py-8">
                 <div class="flex flex-col md:flex-row justify-between items-center">

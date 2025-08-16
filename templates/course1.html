@@ -1,0 +1,207 @@
+lim<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course: Basic to Advanced - Trade with Plan</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <style>
+        /* Reusing your custom styles for consistency */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0a0a0a;
+            color: #e2e8f0;
+        }
+        .gradient-text {
+            background: linear-gradient(90deg, #a78bfa, #6b21a8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: inherit;
+            font-weight: inherit;
+        }
+        /* Custom scrollbar for the course playlist */
+        .course-content-scroll::-webkit-scrollbar {
+            width: 8px;
+        }
+        .course-content-scroll::-webkit-scrollbar-track {
+            background: #1e1e1e; /* Darker track for contrast */
+        }
+        .course-content-scroll::-webkit-scrollbar-thumb {
+            background-color: #8b5cf6;
+            border-radius: 10px;
+            border: 2px solid transparent;
+            background-clip: content-box;
+        }
+        .course-content-scroll {
+            scrollbar-width: thin;
+            scrollbar-color: #8b5cf6 #1e1e1e;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="min-h-screen flex flex-col">
+
+        <header x-data="{ mobileMenuOpen: false }" class="sticky top-0 z-50 bg-black/50 backdrop-blur-lg border-b border-gray-800">
+             <nav class="container mx-auto px-6 py-4">
+                <div class="flex items-center justify-between">
+                    <a href="/" class="flex items-center space-x-3">
+                        <span class="text-2xl font-bold">
+                            <span class="text-white">Trade</span><span class="text-purple-600 gradient-text">with</span><span class="text-white">Plan</span>
+                        </span>
+                    </a>
+
+                    <div class="hidden md:flex items-center space-x-8">
+                        <a href="/#features" class="text-gray-300 hover:text-purple-500 transition-colors">Features</a>
+                        <a href="/#pricing" class="text-gray-300 hover:text-purple-500 transition-colors">Pricing</a>
+                        <a href="{{ url_for('logout') }}" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors">Logout</a>
+                    </div>
+
+                    <div class="md:hidden">
+                        <button @click="mobileMenuOpen = !mobileMenuOpen" class="text-white focus:outline-none">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div x-show="mobileMenuOpen" @click.away="mobileMenuOpen = false" class="md:hidden mt-4 space-y-4" x-transition>
+                    <a href="/#features" class="block text-gray-300 hover:text-purple-500 transition-colors">Features</a>
+                    <a href="/#pricing" class="block text-gray-300 hover:text-purple-500 transition-colors">Pricing</a>
+                    <a href="{{ url_for('logout') }}" class="block bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors text-center">Logout</a>
+                </div>
+            </nav>
+        </header>
+
+        <main class="flex-grow container mx-auto px-4 sm:px-6 py-8">
+
+            <div x-data="coursePlayer()" x-init="init()" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+                <div class="lg:col-span-2">
+                    
+                    <div class="aspect-w-16 aspect-h-9 rounded-lg overflow-hidden shadow-2xl shadow-purple-900/20 border border-gray-800">
+                        <iframe
+                            :src="`https://www.youtube.com/embed/${currentVideo.youtubeId}`"
+                            title="YouTube video player"
+                            frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            allowfullscreen
+                            class="w-full h-full">
+                        </iframe>
+                    </div>
+
+                    <div class="mt-6 p-6 bg-gray-900 border border-gray-800 rounded-lg">
+                        <h1 class="text-2xl md:text-3xl font-bold text-white mb-2" x-text="currentVideo.title"></h1>
+                        <p class="text-gray-400" x-text="currentVideo.description"></p>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-1">
+                    <div class="bg-gray-900 border border-gray-800 rounded-lg h-full flex flex-col">
+                        <div class="p-4 border-b border-gray-700">
+                            <h2 class="text-xl font-bold text-white" x-text="courseTitle"></h2>
+                            <p class="text-sm text-gray-400">
+                                <span x-text="currentVideo.id"></span> / <span x-text="lectures.length"></span> Lectures
+                            </p>
+                        </div>
+
+                        <ul class="course-content-scroll flex-grow overflow-y-auto">
+                            <template x-for="lecture in lectures" :key="lecture.id">
+                                <li @click="selectVideo(lecture)"
+                                    class="flex items-start p-4 cursor-pointer hover:bg-purple-900/30 transition-colors duration-200"
+                                    :class="{'bg-purple-800/50 border-l-4 border-purple-500': currentVideo.id === lecture.id}">
+                                    
+                                    <div class="text-2xl font-bold mr-4"
+                                        :class="currentVideo.id === lecture.id ? 'text-purple-400' : 'text-gray-500'"
+                                        x-text="lecture.id.toString().padStart(2, '0')">
+                                    </div>
+
+                                    <div>
+                                        <h3 class="font-semibold" :class="{'text-white': currentVideo.id === lecture.id, 'text-gray-300': currentVideo.id !== lecture.id}" x-text="lecture.title"></h3>
+                                        <p class="text-xs text-gray-500" x-text="lecture.duration"></p>
+                                    </div>
+                                </li>
+                            </template>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <script>
+            function coursePlayer() {
+                return {
+                    // 1. CHANGE THE COURSE TITLE
+                    courseTitle: 'Basic to Advanced Trading',
+
+                    // 2. CHANGE THE LIST OF LECTURES AND YOUTUBE VIDEO IDs
+                    lectures: [
+                        {
+                            id: 1,
+                            title: 'Introduction to Market Structure',
+                            description: 'Learn the fundamentals of market structure, including identifying trends, swing points, and key levels. This is the foundation of our trading strategy.',
+                            youtubeId: 'LrKzzxbaFok', // <-- Replace with your YouTube Video ID
+                            duration: '12:45'
+                        },
+                        {
+                            id: 2,
+                            title: 'Understanding Liquidity and Fair Value Gaps (FVG)',
+                            description: 'Discover what liquidity is, where it resides in the market, and how to identify and use Fair Value Gaps for high-probability entries.',
+                            youtubeId: 'QcAkY2wG2Wg', // <-- Replace with your YouTube Video ID
+                            duration: '18:20'
+                        },
+                        {
+                            id: 3,
+                            title: 'The "Forever Model" Entry Strategy',
+                            description: 'A deep dive into our core entry model. We will break down the complete setup, from identifying bias to executing the trade with precise stop loss and take profit targets.',
+                            youtubeId: '3u-p82sTbt0', // <-- Replace with your YouTube Video ID
+                            duration: '25:10'
+                        },
+                        {
+                            id: 4,
+                            title: 'Risk Management and Trading Psychology',
+                            description: 'The most important lesson. Learn how to manage your risk effectively to protect your capital and develop the mindset of a professional trader.',
+                            youtubeId: 'q-s_50Qv_14', // <-- Replace with your YouTube Video ID
+                            duration: '22:30'
+                        },
+                        // Add more lecture objects here for the rest of your course
+                    ],
+                    currentVideo: {},
+                    init() {
+                        // Set the first video as the current one on page load
+                        this.currentVideo = this.lectures[0];
+                    },
+                    selectVideo(lecture) {
+                        this.currentVideo = lecture;
+                    }
+                }
+            }
+        </script>
+
+
+        <footer class="border-t border-gray-800 mt-auto">
+            <div class="container mx-auto px-6 py-8">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="text-center md:text-left mb-4 md:mb-0">
+                        <p class="text-gray-400">&copy; 2025 Trade with Plan. All Rights Reserved.</p>
+                        <p class="text-sm text-gray-500">Built for traders, by traders.</p>
+                    </div>
+                    <div class="flex space-x-6 text-sm">
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">Privacy Policy</a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">Terms of Service</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+
+</body>
+</html>
