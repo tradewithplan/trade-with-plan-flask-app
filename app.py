@@ -13,6 +13,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import psycopg2
 import psycopg2.extras  # Needed to access columns by name
 from dotenv import load_dotenv
+import pytz
 
 
 app = Flask(__name__)
@@ -198,6 +199,12 @@ app.config['ADMIN_EMAIL'] = os.environ.get('ADMIN_EMAIL')
 mail = Mail(app)
 
 # 5. New route to handle course purchases
+# Add pytz to your imports at the top of the file
+from datetime import datetime
+import pytz
+
+# ... your other imports
+
 @app.route('/purchase/<string:course_name>', methods=['POST'])
 @login_required
 def purchase(course_name):
@@ -214,8 +221,6 @@ def purchase(course_name):
 
         # --- Email Sending Logic ---
         try:
-            # 1. Fetch user's name and email from the database
-            # CORRECTED: Use 'fullname' to match your database schema
             cur.execute("SELECT fullname, email FROM users WHERE id = %s", (session['user_id'],))
             user = cur.fetchone()
 
@@ -237,9 +242,17 @@ def purchase(course_name):
                 mail.send(msg_user)
 
                 # --- Part B: Send Notification Email to the ADMIN/MENTOR ---
-                # CORRECTED: Use the 'fullname' key
                 admin_subject = f"New Course Sale: '{course_name}' by {user['fullname']}"
-                purchase_time = datetime.now().strftime('%d %b %Y, %I:%M %p IST')
+
+                # --- CORRECTED TIMEZONE LOGIC ---
+                # 1. Get the standard UTC time
+                utc_now = datetime.utcnow().replace(tzinfo=pytz.utc)
+                # 2. Define the IST timezone
+                ist_tz = pytz.timezone('Asia/Kolkata')
+                # 3. Convert UTC time to IST
+                ist_now = utc_now.astimezone(ist_tz)
+                # 4. Format the IST time string (using %Z to get the timezone name automatically)
+                purchase_time = ist_now.strftime('%d %b %Y, %I:%M %p %Z')
                 
                 msg_admin = Message(admin_subject, sender=app.config['MAIL_USERNAME'], recipients=[app.config['ADMIN_EMAIL']])
                 msg_admin.html = f"""
