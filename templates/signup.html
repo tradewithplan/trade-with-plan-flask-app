@@ -179,12 +179,12 @@
             // Check if passwords match
             const checkPasswordMatch = () => {
                 // If both fields are empty, clear message
-                if (confirmPasswordInput.value = '' && passwordInput.value = '') {
+                if (confirmPasswordInput.value === '' && passwordInput.value === '') {
                     matchIndicator.textContent = '';
                     return;
                 }
-                // If both match
-                if (confirmPasswordInput.value ! '' && passwordInput.value = confirmPasswordInput.value) {
+                // If both match and not empty
+                if (confirmPasswordInput.value !== '' && passwordInput.value === confirmPasswordInput.value) {
                     matchIndicator.textContent = '✓ Passwords match';
                     matchIndicator.classList.add(validClass);
                     matchIndicator.classList.remove(errorClass);
@@ -195,25 +195,24 @@
                 }
             };
             
-            // Show criteria on focus
+            // Show password criteria when password field is focused
             passwordInput.addEventListener('focus', () => {
                 passwordCriteria.classList.remove('opacity-0', 'invisible', 'scale-95');
                 passwordCriteria.classList.add('opacity-100', 'visible', 'scale-100');
             });
 
-            // Hide criteria on blur
+            // Hide password criteria when password field loses focus
             passwordInput.addEventListener('blur', () => {
                 passwordCriteria.classList.remove('opacity-100', 'visible', 'scale-100');
                 passwordCriteria.classList.add('opacity-0', 'invisible', 'scale-95');
             });
 
-            // Validate while typing
+            // Validate password strength and check match on every input
             passwordInput.addEventListener('input', validatePassword);
             passwordInput.addEventListener('input', checkPasswordMatch);
-
-            // Confirm password validation
             confirmPasswordInput.addEventListener('input', checkPasswordMatch);
         });
     </script>
+
 </body>
 </html>
