@@ -1,33 +1,31 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Sign Up - Trade with Plan</title>
-    
-    <!-- Tailwind CSS CDN for styling -->
+
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- Google Fonts (Inter) -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
-    <!-- Custom CSS styles -->
+    <!-- Google One Tap & Sign-in script -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+    <!-- Custom Styles -->
     <style>
-        /* Global body styling */
         body {
             font-family: 'Inter', sans-serif;
             background-color: #0a0a0a;
             color: #e2e8f0;
         }
-
-        /* Gradient effect for title text */
         .gradient-text {
             background: linear-gradient(90deg, #a78bfa, #6b21a8);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-
-        /* CTA button animations */
         .cta-button {
             transition: all 0.3s ease;
             box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
@@ -40,12 +38,11 @@
 </head>
 <body class="antialiased">
 
-    <!-- Flash message handler (Flask/Jinja2 template block) -->
+    <!-- Flash messages (Flask / Jinja2) -->
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             <div class="fixed top-0 left-0 right-0 p-4 z-50">
                 {% for category, message in messages %}
-                    <!-- Display flash messages dynamically (success = green, error = red) -->
                     <div class="max-w-md mx-auto p-3 mb-2 rounded shadow-lg {{ 'bg-green-500 text-white' if category == 'success' else 'bg-red-500 text-white' }}">
                         {{ message }}
                     </div>
@@ -54,10 +51,10 @@
         {% endif %}
     {% endwith %}
 
-    <!-- Centered container for signup form -->
+    <!-- Main container -->
     <div class="flex min-h-screen items-center justify-center px-4 py-8">
         <div class="w-full max-w-md bg-gray-900 rounded-2xl shadow-lg border border-gray-800 p-8">
-            
+
             <!-- Title & subtitle -->
             <div class="text-center mb-8">
                 <h1 class="text-3xl font-extrabold">
@@ -73,26 +70,25 @@
                 <div>
                     <label for="fullname" class="block text-sm font-medium text-gray-300">Full Name</label>
                     <input type="text" id="fullname" name="fullname" required
-                           class="mt-2 block w-full rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:border-purple-500 focus:ring-purple-500 px-4 py-3">
+                        class="mt-2 block w-full rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:border-purple-500 focus:ring-purple-500 px-4 py-3" />
                 </div>
 
                 <!-- Email input -->
                 <div>
                     <label for="email" class="block text-sm font-medium text-gray-300">Email Address</label>
                     <input type="email" id="email" name="email" required
-                           class="mt-2 block w-full rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:border-purple-500 focus:ring-purple-500 px-4 py-3">
+                        class="mt-2 block w-full rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:border-purple-500 focus:ring-purple-500 px-4 py-3" />
                 </div>
-                
-                <!-- Password input with live validation -->
+
+                <!-- Password input with validation -->
                 <div class="relative">
                     <label for="password" class="block text-sm font-medium text-gray-300">Password</label>
                     <input type="password" id="password" name="password" required
-                           class="mt-2 block w-full rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:border-purple-500 focus:ring-purple-500 px-4 py-3">
+                        class="mt-2 block w-full rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:border-purple-500 focus:ring-purple-500 px-4 py-3" />
                     
-                    <!-- Password strength indicators -->
-                    <div id="password-criteria" 
-                         class="absolute top-full mt-2 w-full bg-gray-800 border border-gray-700 rounded-lg p-4 shadow-lg z-10 
-                                opacity-0 invisible scale-95 transform transition-all duration-200 ease-out space-y-1">
+                    <!-- Password strength criteria -->
+                    <div id="password-criteria"
+                        class="absolute top-full mt-2 w-full bg-gray-800 border border-gray-700 rounded-lg p-4 shadow-lg z-10 opacity-0 invisible scale-95 transform transition-all duration-200 ease-out space-y-1">
                         <p id="length" class="text-gray-400 text-xs sm:text-sm">At least 8 characters</p>
                         <p id="lowercase" class="text-gray-400 text-xs sm:text-sm">A lowercase letter</p>
                         <p id="uppercase" class="text-gray-400 text-xs sm:text-sm">An uppercase letter</p>
@@ -105,14 +101,13 @@
                 <div>
                     <label for="confirm-password" class="block text-sm font-medium text-gray-300">Confirm Password</label>
                     <input type="password" id="confirm-password" name="confirm-password" required
-                           class="mt-2 block w-full rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:border-purple-500 focus:ring-purple-500 px-4 py-3">
-                    <!-- Password match status -->
+                        class="mt-2 block w-full rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:border-purple-500 focus:ring-purple-500 px-4 py-3" />
                     <p id="match-indicator" class="mt-2 text-sm h-4"></p>
                 </div>
 
                 <!-- Submit button -->
                 <button type="submit"
-                        class="w-full cta-button bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg">
+                    class="w-full cta-button bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg">
                     Create Account
                 </button>
             </form>
@@ -124,44 +119,56 @@
                 <div class="flex-grow h-px bg-gray-700"></div>
             </div>
 
-            <!-- Google sign-up button -->
-            <button class="w-full bg-gray-800 hover:bg-gray-700 text-white font-medium py-3 px-6 rounded-lg flex items-center justify-center space-x-3">
-                <img src="https://www.svgrepo.com/show/355037/google.svg" class="w-5 h-5" alt="Google Logo">
-                <span>Sign Up with Google</span>
-            </button>
+            <!-- Google One Tap & Sign In Button -->
+            <div id="g_id_onload"
+                data-client_id="{{ google_client_id }}"
+                data-context="signup"
+                data-ux_mode="popup"
+                data-callback="handleCredentialResponse"
+                data-nonce="">
+            </div>
+            <div class="g_id_signin flex justify-center"
+                data-type="standard"
+                data-shape="rectangular"
+                data-theme="outline"
+                data-text="signup_with"
+                data-size="large"
+                data-logo_alignment="left">
+            </div>
 
             <!-- Redirect to login -->
             <p class="text-center text-sm text-gray-400 mt-6">
-                Already have an account? 
+                Already have an account?
                 <a href="{{ url_for('login') }}" class="text-purple-400 hover:underline">Login</a>
             </p>
         </div>
     </div>
-    
-    <!-- Password validation script -->
+
+    <!-- Scripts -->
     <script>
+        // Run once DOM is ready
         document.addEventListener('DOMContentLoaded', () => {
             // Input fields
             const passwordInput = document.getElementById('password');
             const confirmPasswordInput = document.getElementById('confirm-password');
             const matchIndicator = document.getElementById('match-indicator');
             const passwordCriteria = document.getElementById('password-criteria');
-
-            // Password criteria regex and elements
+            
+            // Password validation rules with regex and corresponding elements
             const criteria = {
-                length: { el: document.getElementById('length'), regex: /.{8,}/ },      // Minimum 8 chars
-                lowercase: { el: document.getElementById('lowercase'), regex: /[a-z]/ }, // Contains lowercase
-                uppercase: { el: document.getElementById('uppercase'), regex: /[A-Z]/ }, // Contains uppercase
-                number: { el: document.getElementById('number'), regex: /[0-9]/ },       // Contains number
-                symbol: { el: document.getElementById('symbol'), regex: /[!@#$%^&*(),.?":{}|<>]/ } // Contains special char
+                length: { el: document.getElementById('length'), regex: /.{8,}/ },
+                lowercase: { el: document.getElementById('lowercase'), regex: /[a-z]/ },
+                uppercase: { el: document.getElementById('uppercase'), regex: /[A-Z]/ },
+                number: { el: document.getElementById('number'), regex: /[0-9]/ },
+                symbol: { el: document.getElementById('symbol'), regex: /[!@#$%^&*(),.?":{}|<>]/ }
             };
 
-            // CSS classes for valid/invalid states
+            // CSS classes for feedback
             const validClass = 'text-green-400';
             const invalidClass = 'text-gray-400';
             const errorClass = 'text-red-500';
 
-            // Validate password against criteria
+            // Updates password criteria colors based on validity
             const validatePassword = () => {
                 const password = passwordInput.value;
                 for (const key in criteria) {
@@ -176,14 +183,12 @@
                 }
             };
 
-            // Check if passwords match
+            // Checks if passwords match and updates message
             const checkPasswordMatch = () => {
-                // If both fields are empty, clear message
                 if (confirmPasswordInput.value === '' && passwordInput.value === '') {
                     matchIndicator.textContent = '';
                     return;
                 }
-                // If both match and not empty
                 if (confirmPasswordInput.value !== '' && passwordInput.value === confirmPasswordInput.value) {
                     matchIndicator.textContent = '✓ Passwords match';
                     matchIndicator.classList.add(validClass);
@@ -194,25 +199,47 @@
                     matchIndicator.classList.remove(validClass);
                 }
             };
-            
-            // Show password criteria when password field is focused
+
+            // Show password criteria on focus
             passwordInput.addEventListener('focus', () => {
                 passwordCriteria.classList.remove('opacity-0', 'invisible', 'scale-95');
                 passwordCriteria.classList.add('opacity-100', 'visible', 'scale-100');
             });
 
-            // Hide password criteria when password field loses focus
+            // Hide password criteria on blur
             passwordInput.addEventListener('blur', () => {
                 passwordCriteria.classList.remove('opacity-100', 'visible', 'scale-100');
                 passwordCriteria.classList.add('opacity-0', 'invisible', 'scale-95');
             });
 
-            // Validate password strength and check match on every input
+            // Validate password and match on input events
             passwordInput.addEventListener('input', validatePassword);
             passwordInput.addEventListener('input', checkPasswordMatch);
             confirmPasswordInput.addEventListener('input', checkPasswordMatch);
         });
-    </script>
 
+        // Google Sign-In Callback: Sends token to backend for verification
+        function handleCredentialResponse(response) {
+            fetch('/auth/google', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token: response.credential }),
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    // Redirect on successful login
+                    window.location.href = '/';
+                } else {
+                    console.error("Google sign-in failed:", data.message);
+                    alert("Google sign-in failed. Please try again.");
+                }
+            })
+            .catch(error => {
+                console.error("Error during fetch:", error);
+                alert("An error occurred. Please try again.");
+            });
+        }
+    </script>
 </body>
 </html>

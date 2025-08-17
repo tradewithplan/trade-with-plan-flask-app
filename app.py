@@ -15,6 +15,9 @@ import psycopg2
 import psycopg2.extras  # Needed to access columns by name
 from dotenv import load_dotenv
 import pytz
+import requests
+from google.oauth2 import id_token
+from google.auth.transport import requests as google_requests
 
 
 app = Flask(__name__)
@@ -88,6 +91,21 @@ def init_db():
         conn.close()
         print("Database initialized with users and purchases tables.")
 
+
+# Flask-Mail configuration
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+# Use environment variables for sensitive data in production
+app.config['MAIL_USERNAME'] = os.environ.get('EMAIL_USER') # Your email address
+app.config['MAIL_PASSWORD'] = os.environ.get('EMAIL_PASS') # Your App Password
+# ADD THIS LINE for the admin's email
+app.config['ADMIN_EMAIL'] = os.environ.get('ADMIN_EMAIL')
+# --- Add your Google Client ID to the app's config ---
+app.config['GOOGLE_CLIENT_ID'] = os.getenv('GOOGLE_CLIENT_ID') # Get client ID from .env file
+
+# Initialize the Mail instance
+mail = Mail(app)
 
 # ---------- Decorators ----------
 def login_required(f):
@@ -193,6 +211,7 @@ def signup():
     return render_template('signup.html')
 
 
+# --- 4. MODIFY THE LOGIN ROUTE FOR GOOGLE USERS ---
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if 'user_id' in session:
@@ -206,16 +225,24 @@ def login():
         cur.execute("SELECT * FROM users WHERE email = %s", (email,))
         user = cur.fetchone()
 
-        if user and check_password_hash(user['password'], password):
-            session['user_id'] = user['id']
-            session['user_name'] = user['fullname']
-            flash("Login successful!", "success")
-            return redirect(url_for('home'))
-        else:
-            flash("Invalid email or password.", "error")
-            return redirect(url_for('login'))
+        if user:
+            # IMPORTANT CHECK: If the password field contains our Google placeholder
+            if user['password'] == 'GOOGLE_SSO':
+                flash("This account was created with Google. Please use the 'Sign in with Google' button.", "error")
+                return redirect(url_for('login'))
+            
+            # Proceed with normal password check
+            if check_password_hash(user['password'], password):
+                session['user_id'] = user['id']
+                session['user_name'] = user['fullname']
+                flash("Login successful!", "success")
+                return redirect(url_for('home'))
 
-    return render_template('login.html')
+        flash("Invalid email or password.", "error")
+        return redirect(url_for('login'))
+
+    # --- 3. PASS CLIENT ID TO TEMPLATE ---
+    return render_template('login.html', google_client_id=app.config['GOOGLE_CLIENT_ID'])
 
 
 @app.route('/logout')
@@ -226,23 +253,61 @@ def logout():
     return redirect(url_for('home')) 
 
 
-# Flask-Mail configuration
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
-# Use environment variables for sensitive data in production
-app.config['MAIL_USERNAME'] = os.environ.get('EMAIL_USER') # Your email address
-app.config['MAIL_PASSWORD'] = os.environ.get('EMAIL_PASS') # Your App Password
-# ADD THIS LINE for the admin's email
-app.config['ADMIN_EMAIL'] = os.environ.get('ADMIN_EMAIL')
+# --- 5. ADD THE NEW GOOGLE AUTH CALLBACK ROUTE ---
+@app.route('/auth/google', methods=['POST'])
+def auth_google():
+    try:
+        # Get the ID token sent by the client
+        token = request.json.get('token')
+        if not token:
+            return {"success": False, "message": "No token provided."}, 400
 
-# Initialize the Mail instance
-mail = Mail(app)
+        # Verify the token against Google's public keys
+        id_info = id_token.verify_oauth2_token(
+            token, google_requests.Request(), app.config['GOOGLE_CLIENT_ID']
+        )
+
+        # Extract user information
+        user_email = id_info['email']
+        user_name = id_info.get('name', 'N/A')
+        
+        cur = get_db()
+        
+        # Check if user already exists
+        cur.execute("SELECT * FROM users WHERE email = %s", (user_email,))
+        user = cur.fetchone()
+
+        if user:
+            # User exists, log them in
+            session['user_id'] = user['id']
+            session['user_name'] = user['fullname']
+        else:
+            # User is new, create an account
+            # We insert 'GOOGLE_SSO' to satisfy the 'NOT NULL' constraint on the password column.
+            cur.execute(
+                "INSERT INTO users (fullname, email, password) VALUES (%s, %s, %s) RETURNING id",
+                (user_name, user_email, 'GOOGLE_SSO')
+            )
+            new_user_id = cur.fetchone()['id']
+            cur.connection.commit()
+            
+            # Log the new user in
+            session['user_id'] = new_user_id
+            session['user_name'] = user_name
+
+        flash("Successfully logged in with Google!", "success")
+        return {"success": True}
+
+    except ValueError:
+        # This error is raised by verify_oauth2_token if the token is invalid
+        return {"success": False, "message": "Invalid Google token."}, 401
+    except Exception as e:
+        # Log the error for debugging
+        app.logger.error(f"Error during Google authentication: {e}")
+        return {"success": False, "message": "An internal error occurred."}, 500
+
 
 # 5. New route to handle course purchases
-# Add pytz to your imports at the top of the file
-from datetime import datetime
-import pytz
 
 
 @app.route('/purchase/<string:course_name>', methods=['POST'])
@@ -325,6 +390,7 @@ def purchase(course_name):
         flash(f"An error occurred during purchase: {e}", "error")
 
     return redirect(url_for('home'))
+
 
 @app.route('/course1')
 def course1():
