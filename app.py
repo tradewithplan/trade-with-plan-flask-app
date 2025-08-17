@@ -4,6 +4,7 @@
 import os
 from functools import wraps
 from datetime import datetime
+import re
 
 # Third-party library imports
 from flask import Flask, render_template, request, redirect, session, url_for, g, flash
@@ -128,6 +129,30 @@ def home():
     return render_template('index.html', purchased_courses=purchased_courses)
 
 
+def is_strong_password(password):
+    """
+    Checks if a password meets the strength requirements.
+    Returns None if the password is strong, otherwise an error message string.
+    """
+    # Minimum 8 characters
+    if len(password) < 8:
+        return "Password must be at least 8 characters long."
+    # Must contain at least one lowercase letter
+    if not re.search(r"[a-z]", password):
+        return "Password must contain at least one lowercase letter."
+    # Must contain at least one uppercase letter
+    if not re.search(r"[A-Z]", password):
+        return "Password must contain at least one uppercase letter."
+    # Must contain at least one number
+    if not re.search(r"[0-9]", password):
+        return "Password must contain at least one number."
+    # Must contain at least one special character
+    if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", password):
+        return "Password must contain at least one special character (e.g., !@#$%)."
+    
+    # If all checks pass
+    return None
+
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
@@ -136,9 +161,20 @@ def signup():
         password = request.form['password']
         confirm_password = request.form['confirm-password']
 
+        # --- START: Password Validation Logic ---
+        
+        # 1. Check if passwords match
         if password != confirm_password:
             flash("Passwords do not match.", "error")
             return redirect(url_for('signup'))
+            
+        # 2. Check for password strength
+        strength_error = is_strong_password(password)
+        if strength_error:
+            flash(strength_error, "error") # Flash the specific reason
+            return redirect(url_for('signup'))
+            
+        # --- END: Password Validation Logic ---
 
         hashed_password = generate_password_hash(password)
 

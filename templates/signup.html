@@ -4,24 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up - Trade with Plan</title>
-
-    <!-- Tailwind CSS -->
+    
+    <!-- Tailwind CSS CDN for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Google Fonts: Inter -->
+    <!-- Google Fonts (Inter) -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
+    <!-- Custom CSS styles -->
     <style>
+        /* Global body styling */
         body {
             font-family: 'Inter', sans-serif;
             background-color: #0a0a0a;
             color: #e2e8f0;
         }
+
+        /* Gradient effect for title text */
         .gradient-text {
             background: linear-gradient(90deg, #a78bfa, #6b21a8);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
+
+        /* CTA button animations */
         .cta-button {
             transition: all 0.3s ease;
             box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
@@ -34,24 +40,25 @@
 </head>
 <body class="antialiased">
 
-    <!-- BEGIN: Flask Flash Message Block -->
+    <!-- Flash message handler (Flask/Jinja2 template block) -->
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-            <div class="p-4 mb-4">
+            <div class="fixed top-0 left-0 right-0 p-4 z-50">
                 {% for category, message in messages %}
-                    <div class="p-3 mb-2 rounded {{ 'bg-green-500' if category == 'success' else 'bg-red-500' }}">
+                    <!-- Display flash messages dynamically (success = green, error = red) -->
+                    <div class="max-w-md mx-auto p-3 mb-2 rounded shadow-lg {{ 'bg-green-500 text-white' if category == 'success' else 'bg-red-500 text-white' }}">
                         {{ message }}
                     </div>
                 {% endfor %}
             </div>
         {% endif %}
     {% endwith %}
-    <!-- END: Flask Flash Message Block -->
 
-    <div class="flex min-h-screen items-center justify-center px-4">
+    <!-- Centered container for signup form -->
+    <div class="flex min-h-screen items-center justify-center px-4 py-8">
         <div class="w-full max-w-md bg-gray-900 rounded-2xl shadow-lg border border-gray-800 p-8">
             
-            <!-- Logo -->
+            <!-- Title & subtitle -->
             <div class="text-center mb-8">
                 <h1 class="text-3xl font-extrabold">
                     <span class="text-white">Trade</span><span class="gradient-text">with</span><span class="text-white">Plan</span>
@@ -59,32 +66,51 @@
                 <p class="text-gray-400 mt-2">Create your account</p>
             </div>
 
-            <!-- Sign Up Form -->
+            <!-- Signup form -->
             <form action="/signup" method="POST" class="space-y-6">
+
+                <!-- Full Name input -->
                 <div>
                     <label for="fullname" class="block text-sm font-medium text-gray-300">Full Name</label>
                     <input type="text" id="fullname" name="fullname" required
                            class="mt-2 block w-full rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:border-purple-500 focus:ring-purple-500 px-4 py-3">
                 </div>
 
+                <!-- Email input -->
                 <div>
                     <label for="email" class="block text-sm font-medium text-gray-300">Email Address</label>
                     <input type="email" id="email" name="email" required
                            class="mt-2 block w-full rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:border-purple-500 focus:ring-purple-500 px-4 py-3">
                 </div>
-
-                <div>
+                
+                <!-- Password input with live validation -->
+                <div class="relative">
                     <label for="password" class="block text-sm font-medium text-gray-300">Password</label>
                     <input type="password" id="password" name="password" required
                            class="mt-2 block w-full rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:border-purple-500 focus:ring-purple-500 px-4 py-3">
+                    
+                    <!-- Password strength indicators -->
+                    <div id="password-criteria" 
+                         class="absolute top-full mt-2 w-full bg-gray-800 border border-gray-700 rounded-lg p-4 shadow-lg z-10 
+                                opacity-0 invisible scale-95 transform transition-all duration-200 ease-out space-y-1">
+                        <p id="length" class="text-gray-400 text-xs sm:text-sm">At least 8 characters</p>
+                        <p id="lowercase" class="text-gray-400 text-xs sm:text-sm">A lowercase letter</p>
+                        <p id="uppercase" class="text-gray-400 text-xs sm:text-sm">An uppercase letter</p>
+                        <p id="number" class="text-gray-400 text-xs sm:text-sm">A number</p>
+                        <p id="symbol" class="text-gray-400 text-xs sm:text-sm">A special character (!@#...)</p>
+                    </div>
                 </div>
 
+                <!-- Confirm password input -->
                 <div>
                     <label for="confirm-password" class="block text-sm font-medium text-gray-300">Confirm Password</label>
                     <input type="password" id="confirm-password" name="confirm-password" required
                            class="mt-2 block w-full rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:border-purple-500 focus:ring-purple-500 px-4 py-3">
+                    <!-- Password match status -->
+                    <p id="match-indicator" class="mt-2 text-sm h-4"></p>
                 </div>
 
+                <!-- Submit button -->
                 <button type="submit"
                         class="w-full cta-button bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg">
                     Create Account
@@ -98,19 +124,96 @@
                 <div class="flex-grow h-px bg-gray-700"></div>
             </div>
 
-            <!-- Google Sign Up -->
+            <!-- Google sign-up button -->
             <button class="w-full bg-gray-800 hover:bg-gray-700 text-white font-medium py-3 px-6 rounded-lg flex items-center justify-center space-x-3">
                 <img src="https://www.svgrepo.com/show/355037/google.svg" class="w-5 h-5" alt="Google Logo">
                 <span>Sign Up with Google</span>
             </button>
 
-            <!-- Login Link -->
+            <!-- Redirect to login -->
             <p class="text-center text-sm text-gray-400 mt-6">
                 Already have an account? 
                 <a href="{{ url_for('login') }}" class="text-purple-400 hover:underline">Login</a>
             </p>
         </div>
     </div>
+    
+    <!-- Password validation script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Input fields
+            const passwordInput = document.getElementById('password');
+            const confirmPasswordInput = document.getElementById('confirm-password');
+            const matchIndicator = document.getElementById('match-indicator');
+            const passwordCriteria = document.getElementById('password-criteria');
 
+            // Password criteria regex and elements
+            const criteria = {
+                length: { el: document.getElementById('length'), regex: /.{8,}/ },      // Minimum 8 chars
+                lowercase: { el: document.getElementById('lowercase'), regex: /[a-z]/ }, // Contains lowercase
+                uppercase: { el: document.getElementById('uppercase'), regex: /[A-Z]/ }, // Contains uppercase
+                number: { el: document.getElementById('number'), regex: /[0-9]/ },       // Contains number
+                symbol: { el: document.getElementById('symbol'), regex: /[!@#$%^&*(),.?":{}|<>]/ } // Contains special char
+            };
+
+            // CSS classes for valid/invalid states
+            const validClass = 'text-green-400';
+            const invalidClass = 'text-gray-400';
+            const errorClass = 'text-red-500';
+
+            // Validate password against criteria
+            const validatePassword = () => {
+                const password = passwordInput.value;
+                for (const key in criteria) {
+                    const criterion = criteria[key];
+                    if (criterion.regex.test(password)) {
+                        criterion.el.classList.add(validClass);
+                        criterion.el.classList.remove(invalidClass);
+                    } else {
+                        criterion.el.classList.add(invalidClass);
+                        criterion.el.classList.remove(validClass);
+                    }
+                }
+            };
+
+            // Check if passwords match
+            const checkPasswordMatch = () => {
+                // If both fields are empty, clear message
+                if (confirmPasswordInput.value = '' && passwordInput.value = '') {
+                    matchIndicator.textContent = '';
+                    return;
+                }
+                // If both match
+                if (confirmPasswordInput.value ! '' && passwordInput.value = confirmPasswordInput.value) {
+                    matchIndicator.textContent = '✓ Passwords match';
+                    matchIndicator.classList.add(validClass);
+                    matchIndicator.classList.remove(errorClass);
+                } else {
+                    matchIndicator.textContent = '✗ Passwords do not match';
+                    matchIndicator.classList.add(errorClass);
+                    matchIndicator.classList.remove(validClass);
+                }
+            };
+            
+            // Show criteria on focus
+            passwordInput.addEventListener('focus', () => {
+                passwordCriteria.classList.remove('opacity-0', 'invisible', 'scale-95');
+                passwordCriteria.classList.add('opacity-100', 'visible', 'scale-100');
+            });
+
+            // Hide criteria on blur
+            passwordInput.addEventListener('blur', () => {
+                passwordCriteria.classList.remove('opacity-100', 'visible', 'scale-100');
+                passwordCriteria.classList.add('opacity-0', 'invisible', 'scale-95');
+            });
+
+            // Validate while typing
+            passwordInput.addEventListener('input', validatePassword);
+            passwordInput.addEventListener('input', checkPasswordMatch);
+
+            // Confirm password validation
+            confirmPasswordInput.addEventListener('input', checkPasswordMatch);
+        });
+    </script>
 </body>
 </html>
