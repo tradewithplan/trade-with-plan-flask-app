@@ -208,7 +208,7 @@ def signup():
             get_db().connection.rollback()
             return redirect(url_for('signup'))
 
-    return render_template('signup.html')
+    return render_template('signup.html', google_client_id=app.config['GOOGLE_CLIENT_ID'])
 
 
 # --- 4. MODIFY THE LOGIN ROUTE FOR GOOGLE USERS ---
