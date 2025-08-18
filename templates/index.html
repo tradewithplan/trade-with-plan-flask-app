@@ -30,6 +30,19 @@
             font-size: inherit;   /* Ensure it’s same as parent */
             font-weight: inherit; /* Keep the boldness */
         }
+        .gradient-golden-text {
+          background: linear-gradient(90deg, #FFD700, #FFA800, #FFB200, #FFD700);
+          background-size: 200%;
+          background-position: left;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;           /* For better browser support */
+          color: transparent;
+          font-size: inherit;              /* Keeps size the same as parent */
+          font-weight: inherit;            /* Keeps boldness from parent */
+          /* Optional: Enhance effect with some shadow */
+          text-shadow: 0 2px 10px rgba(255, 215, 0, 0.25);
+        }
         .cta-button {
             transition: all 0.3s ease;
             box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
@@ -323,7 +336,7 @@
                     <div data-modal-id="modal-basic" class="feature-card flex flex-col w-full max-w-sm p-8 rounded-xl bg-gray-900 border-2 border-gray-700 hover:scale-105 transition-transform cta-course-card">
                         <h3 class="text-2xl font-bold text-white text-center">ICT “Forever Model”</h3>
                         <p class="text-center text-gray-400 mt-2 mb-6">(Advanced)</p>
-                        <p class="text-center text-4xl font-extrabold text-white mb-6">
+                        <p class="gradient-golden-text text-center text-4xl font-extrabold text-white mb-6">
                             $29<span class="text-lg font-medium text-gray-400">(&#x20B9;2,599)</span>
                         </p>
                         <ul class="space-y-4 text-gray-300 mb-8 flex-grow">
@@ -358,7 +371,7 @@
                         <span class="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2 bg-purple-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase z-10">Most Popular</span>
                         <h3 class="text-2xl font-bold text-white text-center">Basic to Advanced</h3>
                         <p class="text-center text-gray-400 mt-2 mb-6">(3 ICT Models Covered)</p>
-                        <p class="text-center text-4xl font-extrabold text-white mb-6">
+                        <p class="gradient-golden-text text-center text-4xl font-extrabold text-white mb-6">
                             $79<span class="text-lg font-medium text-gray-400">(&#x20B9;6,999)</span>
                         </p>
                         <ul class="space-y-4 text-gray-300 mb-8 flex-grow">
@@ -392,7 +405,7 @@
                     <div data-modal-id="modal-pro" class="feature-card flex flex-col w-full max-w-sm p-8 rounded-xl bg-gray-900 border-2 border-gray-700 hover:scale-105 transition-transform cta-course-card">
                         <h3 class="text-2xl font-bold text-white text-center">1-1 Personal Mentorship</h3>
                         <p class="text-center text-gray-400 mt-2 mb-6">(Only <span class="font-bold">2 Slots</span> per month)</p>
-                        <p class="text-center text-4xl font-extrabold text-white mb-6">
+                        <p class="gradient-golden-text text-center text-4xl font-extrabold text-white mb-6">
                             $285<span class="text-lg font-medium text-gray-400">(&#x20B9;24,999)</span>
                         </p>
                         <ul class="space-y-4 text-gray-300 mb-8 flex-grow">
