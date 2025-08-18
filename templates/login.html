@@ -97,28 +97,29 @@
                 <div class="flex-grow h-px bg-gray-700"></div>
             </div>
 
-            <!-- Google Login -->
+            <!-- Google Custom Login Button -- 
             <button id="customGoogleLoginBtn" class="w-full bg-gray-800 hover:bg-gray-700 text-white font-medium py-3 px-6 rounded-lg flex items-center justify-center space-x-3">
                 <img src="https://www.svgrepo.com/show/355037/google.svg" class="w-5 h-5" alt="Google Logo">
                 <span>Continue with Google</span>
             </button>
+            -->
 
             <!-- Google Login Logic -->
             <div id="g_id_onload"
-                 data-client_id="{{ google_client_id }}"
-                 data-context="signin"
-                 data-ux_mode="popup"
-                 data-callback="handleCredentialResponse"
-                 data-nonce="">
+                data-client_id="{{ google_client_id }}"
+                data-context="signin"
+                data-ux_mode="popup"
+                data-callback="handleCredentialResponse"
+                data-nonce="">
             </div>
 
-            <div class="g_id_signin hidden"
-                 data-type="standard"
-                 data-shape="rectangular"
-                 data-theme="outline"
-                 data-text="signin_with"
-                 data-size="large"
-                 data-logo_alignment="left">
+            <div class="g_id_signin flex justify-center"
+                data-type="standard"
+                data-shape="rectangular"
+                data-theme="outline"
+                data-text="signin_with"
+                data-size="large"
+                data-logo_alignment="left">
             </div>
 
             <!-- Sign Up Link -->
@@ -131,7 +132,7 @@
 
     <!-- Google login Logic -->
     <script>
-        // This function will be called by Google's script on successful login
+        // This function is still needed to send the token to your backend
         function handleCredentialResponse(response) {
             // Create a form and submit the token to your backend
             const form = document.createElement('form');
@@ -147,20 +148,6 @@
             document.body.appendChild(form);
             form.submit();
         }
-
-        // This links your custom button to Google's hidden button
-        document.addEventListener('DOMContentLoaded', function() {
-            const customButton = document.getElementById('customGoogleLoginBtn');
-            customButton.addEventListener('click', function() {
-                setTimeout(function() {
-                    const googleButton = document.querySelector('.g_id_signin iframe');
-                    if (googleButton) {
-                        googleButton.click();
-                    }
-                }, 100);
-            });
-        });
     </script>
-
 </body>
 </html>

@@ -119,16 +119,15 @@
                 <div class="flex-grow h-px bg-gray-700"></div>
             </div>
 
-            <!-- Your Custom Google Sign-Up Button -->
+            <!-- Your Custom Google Sign-Up Button --
             <button id="customGoogleBtn" class="w-full bg-gray-800 hover:bg-gray-700 text-white font-medium py-3 px-6 rounded-lg flex items-center justify-center space-x-3 transition-colors duration-200">
                 <img src="https://www.svgrepo.com/show/355037/google.svg" class="w-5 h-5" alt="Google Logo">
                 <span>Sign Up with Google</span>
-            </button>
+            </button> -->
 
             <!-- 
             Google One Tap & Sign In Logic (Required)
             - The g_id_onload div initializes the service.
-            - The g_id_signin div is hidden but will be programmatically "clicked" by our script.
             -->
             <div id="g_id_onload"
                 data-client_id="{{ google_client_id }}"
@@ -138,8 +137,7 @@
                 data-nonce="">
             </div>
 
-            <!-- Note the "hidden" class to hide the default button -->
-            <div class="g_id_signin hidden"
+            <div class="g_id_signin flex justify-center"
                 data-type="standard"
                 data-shape="rectangular"
                 data-theme="outline"
@@ -254,7 +252,7 @@
         }
     </script>
 
-    <!-- JavaScript to link your button to Google's logic -->
+    <!-- JavaScript to link your button to Google's logic --
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Find your custom button
@@ -274,7 +272,7 @@
             }, 100); // 100ms delay
         });
     });
-    </script>
+    </script>  -->
 
 </body>
 </html>
