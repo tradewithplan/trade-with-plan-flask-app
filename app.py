@@ -171,6 +171,8 @@ def is_strong_password(password):
     # If all checks pass
     return None
 
+
+# --- Signup Logic ---
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
@@ -211,38 +213,92 @@ def signup():
     return render_template('signup.html', google_client_id=app.config['GOOGLE_CLIENT_ID'])
 
 
+# --- ADD THIS NEW ROUTE FOR GOOGLE LOGIN ---
+
+@app.route('/google-login', methods=['POST'])
+def google_login():
+    try:
+        # Retrieve the Google credential token sent from frontend
+        token = request.form.get('credential')
+        
+        # Verify the token with Google, ensuring authenticity
+        idinfo = id_token.verify_oauth2_token(
+            token, google_requests.Request(), app.config['GOOGLE_CLIENT_ID']
+        )
+        
+        # Extract user information from validated token
+        user_email = idinfo['email']
+        user_fullname = idinfo['name']
+        
+        cur = get_db()
+        # Check if user already exists in database
+        cur.execute("SELECT * FROM users WHERE email = %s", (user_email,))
+        user = cur.fetchone()
+        if user:
+            # User exists: log them in by setting session variables
+            session['user_id'] = user['id']
+            session['user_name'] = user['fullname']
+        else:
+            # User does not exist: create new user with placeholder password for SSO
+            cur.execute(
+                "INSERT INTO users (fullname, email, password) VALUES (%s, %s, %s) RETURNING id",
+                (user_fullname, user_email, 'GOOGLE_SSO')
+            )
+            new_user_id = cur.fetchone()['id']
+            cur.connection.commit()
+            
+            # Log the new user in by setting session variables
+            session['user_id'] = new_user_id
+            session['user_name'] = user_fullname
+        
+        flash("Successfully logged in with Google!", "success")
+        return redirect(url_for('home'))
+    except ValueError:
+        # Token was invalid or verification failed
+        flash("There was an error logging in with Google.", "error")
+        return redirect(url_for('login'))
+    except Exception as e:
+        # Catch-all for unexpected errors, rollback if needed
+        flash(f"An unexpected error occurred: {e}", "error")
+        get_db().connection.rollback()
+        return redirect(url_for('login'))
+
+# --- MODIFY YOUR EXISTING /login ROUTE ---
+
 # --- 4. MODIFY THE LOGIN ROUTE FOR GOOGLE USERS ---
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    # If already logged in, redirect to home
     if 'user_id' in session:
         return redirect(url_for('home'))
-
+    
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
-
         cur = get_db()
+        # Fetch user details for entered email
         cur.execute("SELECT * FROM users WHERE email = %s", (email,))
         user = cur.fetchone()
-
         if user:
-            # IMPORTANT CHECK: If the password field contains our Google placeholder
+            # --- IMPORTANT CHECK: Handle Google SSO users ---
+            # If password is set as Google SSO placeholder, prevent normal login
             if user['password'] == 'GOOGLE_SSO':
                 flash("This account was created with Google. Please use the 'Sign in with Google' button.", "error")
                 return redirect(url_for('login'))
             
-            # Proceed with normal password check
+            # Normal password authentication for standard users
             if check_password_hash(user['password'], password):
                 session['user_id'] = user['id']
                 session['user_name'] = user['fullname']
                 flash("Login successful!", "success")
                 return redirect(url_for('home'))
-
+        # Either user not found or password invalid
         flash("Invalid email or password.", "error")
         return redirect(url_for('login'))
-
-    # --- 3. PASS CLIENT ID TO TEMPLATE ---
-    return render_template('login.html', google_client_id=app.config['GOOGLE_CLIENT_ID'])
+    
+    # --- ADD THIS LINE TO PASS THE CLIENT ID ---
+    # Render login page with Google client ID for frontend use
+    return render_template('login.html', google_client_id=app.config['GOOGLE_CLIENT_ID']) 
 
 
 @app.route('/logout')

@@ -119,7 +119,17 @@
                 <div class="flex-grow h-px bg-gray-700"></div>
             </div>
 
-            <!-- Google One Tap & Sign In Button -->
+            <!-- Your Custom Google Sign-Up Button -->
+            <button id="customGoogleBtn" class="w-full bg-gray-800 hover:bg-gray-700 text-white font-medium py-3 px-6 rounded-lg flex items-center justify-center space-x-3 transition-colors duration-200">
+                <img src="https://www.svgrepo.com/show/355037/google.svg" class="w-5 h-5" alt="Google Logo">
+                <span>Sign Up with Google</span>
+            </button>
+
+            <!-- 
+            Google One Tap & Sign In Logic (Required)
+            - The g_id_onload div initializes the service.
+            - The g_id_signin div is hidden but will be programmatically "clicked" by our script.
+            -->
             <div id="g_id_onload"
                 data-client_id="{{ google_client_id }}"
                 data-context="signup"
@@ -127,7 +137,9 @@
                 data-callback="handleCredentialResponse"
                 data-nonce="">
             </div>
-            <div class="g_id_signin flex justify-center"
+
+            <!-- Note the "hidden" class to hide the default button -->
+            <div class="g_id_signin hidden"
                 data-type="standard"
                 data-shape="rectangular"
                 data-theme="outline"
@@ -241,5 +253,28 @@
             });
         }
     </script>
+
+    <!-- JavaScript to link your button to Google's logic -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Find your custom button
+        const customButton = document.getElementById('customGoogleBtn');
+    
+        // Add a click listener to your button
+        customButton.addEventListener('click', function() {
+            // Find the Google-rendered button's iframe inside the hidden div
+            // We use a small timeout to ensure Google's script has had time to render the button.
+            setTimeout(function() {
+                const googleButton = document.querySelector('.g_id_signin iframe');
+                if (googleButton) {
+                    googleButton.click();
+                } else {
+                    console.error('Google Sign-In button not found.');
+                }
+            }, 100); // 100ms delay
+        });
+    });
+    </script>
+
 </body>
 </html>
