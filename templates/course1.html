@@ -99,7 +99,14 @@
 
                     <div class="mt-6 p-6 bg-gray-900 border border-gray-800 rounded-lg">
                         <h1 class="text-2xl md:text-3xl font-bold text-white mb-2" x-text="currentVideo.title"></h1>
-                        <p class="text-gray-400" x-text="currentVideo.description"></p>
+                        <div class="text-gray-400 mt-4">
+                            <h4 class="font-semibold text-gray-300 mb-2">Topic covered in this session:</h4>
+                            <ul class="list-disc list-inside space-y-1">
+                                <template x-for="topic in currentVideo.description" :key="topic">
+                                    <li x-text="topic"></li>
+                                </template>
+                            </ul>
+                        </div>
                     </div>
                 </div>
 
@@ -146,35 +153,58 @@
                         {
                             id: 1,
                             title: 'Session 1',
-                            description: 'Learn the fundamentals of market structure, including identifying trends, swing points, and key levels. This is the foundation of our trading strategy.',
+                            // MODIFICATION START: Description is now an array of strings
+                            description: [
+                                'What is Liquidity (BSL, SSL)?'
+                            ],
+                            // MODIFICATION END
                             youtubeId: '9Q3x-fbaM7M', // <-- Replace with your YouTube Video ID
                             duration: '12:45'
                         },
                         {
                             id: 2,
                             title: 'Session 2',
-                            description: 'Discover what liquidity is, where it resides in the market, and how to identify and use Fair Value Gaps for high-probability entries.',
+                            // MODIFICATION START: Description is now an array of strings
+                            description: [
+                                'How to find Right FVG, iFVG?'
+                            ],
+                            // MODIFICATION END
                             youtubeId: '2diIO16ecx8', // <-- Replace with your YouTube Video ID
                             duration: '18:20'
                         },
                         {
                             id: 3,
                             title: 'The "Session 3',
-                            description: 'A deep dive into our core entry model. We will break down the complete setup, from identifying bias to executing the trade with precise stop loss and take profit targets.',
+                            // MODIFICATION START: Description is now an array of strings
+                            description: [
+                                'What is iFVG and What is different between FVG & iFVG?',
+                                'How to Find Trading BIAS?',
+                                'Three Time frame layer Analysis of Liquidity',
+                                'Where and how to take entry using the PD Arrays (FVG, iFVG)?'
+                            ],
+                            // MODIFICATION END
                             youtubeId: 'HF5HlOijxGI', // <-- Replace with your YouTube Video ID
                             duration: '25:10'
                         },
                         {
                             id: 4,
                             title: 'Session 4',
-                            description: 'The most important lesson. Learn how to manage your risk effectively to protect your capital and develop the mindset of a professional trader.',
+                            // MODIFICATION START: Description is now an array of strings
+                            description: [
+                                'Complete Setup will be Explained (TP, SL, BE, RR)'
+                            ],
+                            // MODIFICATION END
                             youtubeId: 'A8cYr_ZPJaE', // <-- Replace with your YouTube Video ID
                             duration: '22:30'
                         },
                         {
                             id: 5,
                             title: 'Session 5',
-                            description: 'The most important lesson. Learn how to manage your risk effectively to protect your capital and develop the mindset of a professional trader.',
+                            // MODIFICATION START: Description is now an array of strings
+                            description: [
+                                'Risk management, Psychology'
+                            ],
+                            // MODIFICATION END
                             youtubeId: 'GN-7sVcDPkU', // <-- Replace with your YouTube Video ID
                             duration: '22:30'
                         },
