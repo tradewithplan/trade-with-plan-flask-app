@@ -448,17 +448,52 @@ def purchase(course_name):
     return redirect(url_for('home'))
 
 
+def user_has_purchased_course(course_name):
+    """
+    Returns True if the currently logged-in user has purchased the given course.
+    """
+    if 'user_id' not in session:
+        return False
+
+    cur = get_db()
+    cur.execute(
+        "SELECT 1 FROM purchases WHERE user_id = %s AND course_name = %s",
+        (session['user_id'], course_name)
+    )
+    return cur.fetchone() is not None
+
+
+from flask import abort
+
+def login_and_purchase_required(course_name):
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            if 'user_id' not in session:
+                flash("You need to be logged in to access this course.", "warning")
+                return redirect(url_for('login'))
+            if not user_has_purchased_course(course_name):
+                flash(f"You need to purchase the '{course_name}' course to access this page.", "warning")
+                return redirect(url_for('home'))
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
+
+
 @app.route('/course1')
+@login_and_purchase_required('ICT "Forever Model"')
 def course1():
     return render_template('course1.html')
 
 
 @app.route('/course2')
+@login_and_purchase_required('Basic to Advanced')
 def course2():
     return render_template('course2.html')
 
 
 @app.route('/course3')
+@login_and_purchase_required('1-1 Personal Mentorship')
 def course3():
     return render_template('course3.html')
 
