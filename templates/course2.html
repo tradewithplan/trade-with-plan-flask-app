@@ -101,6 +101,7 @@
                         <h1 class="text-2xl md:text-3xl font-bold text-white mb-2" x-text="currentVideo.title"></h1>
                         <div class="text-gray-400 mt-4">
                             <h4 class="font-semibold text-gray-300 mb-2">Topic covered in this session:</h4>
+                            <h4 class="font-semibold text-gray-300 mb-2" x-text="currentVideo.descriptionTitle"></h4>
                             <ul class="list-disc list-inside space-y-1">
                                 <template x-for="topic in currentVideo.description" :key="topic">
                                     <li x-text="topic"></li>
@@ -114,7 +115,6 @@
                     <div class="bg-gray-900 border border-gray-800 rounded-lg h-full flex flex-col">
                         <div class="p-4 border-b border-gray-700">
                             <h2 class="text-xl font-bold text-white" x-text="courseTitle"></h2>
-                            <h2 class="text-xl font-bold text-white" x-text="descriptionTitle"></h2>
                             <p class="text-sm text-gray-400">
                                 <span x-text="currentVideo.id"></span> / <span x-text="lectures.length"></span> Lectures
                             </p>
@@ -213,7 +213,7 @@
                             duration: '54:59'
                         },
                         {
-                            id: 5,
+                            id: 6,
                             title: 'Session 6',
                             // MODIFICATION START: Description is now an array of strings
                             description: [
@@ -224,7 +224,7 @@
                             duration: '01:03:07'
                         },
                         {
-                            id: 5,
+                            id: 7,
                             title: 'Session 7',
                             // MODIFICATION START: Description is now an array of strings
                             description: [
@@ -238,7 +238,7 @@
                             duration: '01:07:20'
                         },
                         {
-                            id: 5,
+                            id: 8,
                             title: 'Session 8',
                             descriptionTitle: 'A+ Setup:',
                             // MODIFICATION START: Description is now an array of strings
