@@ -86,7 +86,7 @@
 
                 <div class="lg:col-span-2">
                     
-                    <div class="aspect-w-16 aspect-h-9 rounded-lg overflow-hidden shadow-2xl shadow-purple-900/20 border border-gray-800">
+                    <div class="rounded-lg overflow-hidden shadow-2xl shadow-purple-900/20 border border-gray-800 h-[300px] sm:h-[400px] md:h-[500px] lg:h-[600px]">
                         <iframe
                             :src="`https://www.youtube-nocookie.com/embed/${currentVideo.youtubeId}?rel=0`"
                             title="YouTube video player"
@@ -99,7 +99,14 @@
 
                     <div class="mt-6 p-6 bg-gray-900 border border-gray-800 rounded-lg">
                         <h1 class="text-2xl md:text-3xl font-bold text-white mb-2" x-text="currentVideo.title"></h1>
-                        <p class="text-gray-400" x-text="currentVideo.description"></p>
+                        <div class="text-gray-400 mt-4">
+                            <h4 class="font-semibold text-gray-300 mb-2">Topic covered in this session:</h4>
+                            <ul class="list-disc list-inside space-y-1">
+                                <template x-for="topic in currentVideo.description" :key="topic">
+                                    <li x-text="topic"></li>
+                                </template>
+                            </ul>
+                        </div>
                     </div>
                 </div>
 
@@ -107,6 +114,7 @@
                     <div class="bg-gray-900 border border-gray-800 rounded-lg h-full flex flex-col">
                         <div class="p-4 border-b border-gray-700">
                             <h2 class="text-xl font-bold text-white" x-text="courseTitle"></h2>
+                            <h2 class="text-xl font-bold text-white" x-text="descriptionTitle"></h2>
                             <p class="text-sm text-gray-400">
                                 <span x-text="currentVideo.id"></span> / <span x-text="lectures.length"></span> Lectures
                             </p>
@@ -139,37 +147,111 @@
             function coursePlayer() {
                 return {
                     // 1. CHANGE THE COURSE TITLE
-                    courseTitle: 'Basic to Advanced Trading',
+                    courseTitle: 'ICT FOREVER MODEL',
 
                     // 2. CHANGE THE LIST OF LECTURES AND YOUTUBE VIDEO IDs
                     lectures: [
                         {
                             id: 1,
-                            title: 'Introduction to Market Structure',
-                            description: 'Learn the fundamentals of market structure, including identifying trends, swing points, and key levels. This is the foundation of our trading strategy.',
-                            youtubeId: 'LrKzzxbaFok', // <-- Replace with your YouTube Video ID
-                            duration: '12:45'
+                            title: 'Session 1',
+                            // MODIFICATION START: Description is now an array of strings
+                            description: [
+                                'What is Stock market,  Forex?',
+                                'Introduction,Spread, Brokerage, Lots of Explanation',
+                                'Types of Pairs with High Volume',
+                                'Crypto Introduction'
+                            ],
+                            // MODIFICATION END
+                            youtubeId: '9Q3x-fbaM7M', // <-- Replace with your YouTube Video ID
+                            duration: '01:02:02'
                         },
                         {
                             id: 2,
-                            title: 'Understanding Liquidity and Fair Value Gaps (FVG)',
-                            description: 'Discover what liquidity is, where it resides in the market, and how to identify and use Fair Value Gaps for high-probability entries.',
-                            youtubeId: 'QcAkY2wG2Wg', // <-- Replace with your YouTube Video ID
-                            duration: '18:20'
+                            title: 'Session 2',
+                            // MODIFICATION START: Description is now an array of strings
+                            description: [
+                                'Option Buying vs Option Selling',
+                                'What is ICT PO3 (AMD)?'
+                            ],
+                            // MODIFICATION END
+                            youtubeId: 'HxMxtc0UACM', // <-- Replace with your YouTube Video ID
+                            duration: '01:06:06'
                         },
                         {
                             id: 3,
-                            title: 'The "Forever Model" Entry Strategy',
-                            description: 'A deep dive into our core entry model. We will break down the complete setup, from identifying bias to executing the trade with precise stop loss and take profit targets.',
-                            youtubeId: '3u-p82sTbt0', // <-- Replace with your YouTube Video ID
-                            duration: '25:10'
+                            title: 'Session 3',
+                            // MODIFICATION START: Description is now an array of strings
+                            description: [
+                                'What is Candlesticks & Time Frame?',
+                                'Explanation Difference Between FVG & iFVG',
+                                'How to Find Right FVG?'
+                            ],
+                            // MODIFICATION END
+                            youtubeId: 'Q0hR34neHd8', // <-- Replace with your YouTube Video ID
+                            duration: '58:44'
                         },
                         {
                             id: 4,
-                            title: 'Risk Management and Trading Psychology',
-                            description: 'The most important lesson. Learn how to manage your risk effectively to protect your capital and develop the mindset of a professional trader.',
-                            youtubeId: 'q-s_50Qv_14', // <-- Replace with your YouTube Video ID
-                            duration: '22:30'
+                            title: 'Session 4',
+                            // MODIFICATION START: Description is now an array of strings
+                            description: [
+                                'Entry Based on TBS & FVG'
+                            ],
+                            // MODIFICATION END
+                            youtubeId: 'v99BKGBJCqI', // <-- Replace with your YouTube Video ID
+                            duration: '01:06:45'
+                        },
+                        {
+                            id: 5,
+                            title: 'Session 5',
+                            // MODIFICATION START: Description is now an array of strings
+                            description: [
+                                'Importance of TBS & TWS'
+                            ],
+                            // MODIFICATION END
+                            youtubeId: 'aMFHmYKGPSw', // <-- Replace with your YouTube Video ID
+                            duration: '54:59'
+                        },
+                        {
+                            id: 5,
+                            title: 'Session 6',
+                            // MODIFICATION START: Description is now an array of strings
+                            description: [
+                                'Complete Setup explanation, MSS Explained'
+                            ],
+                            // MODIFICATION END
+                            youtubeId: 'KK-d0CjJJ14', // <-- Replace with your YouTube Video ID
+                            duration: '01:03:07'
+                        },
+                        {
+                            id: 5,
+                            title: 'Session 7',
+                            // MODIFICATION START: Description is now an array of strings
+                            description: [
+                                'TP, SL Explanation',
+                                '(50 - 50) Strategy to Maximize Profits',
+                                'Lot Size Management',
+                                'Importance of Trading Psychology'
+                            ],
+                            // MODIFICATION END
+                            youtubeId: 'P7fAoqxjWwQ', // <-- Replace with your YouTube Video ID
+                            duration: '01:07:20'
+                        },
+                        {
+                            id: 5,
+                            title: 'Session 8',
+                            descriptionTitle: 'A+ Setup:',
+                            // MODIFICATION START: Description is now an array of strings
+                            description: [
+                                'Session Based Entry Setup',
+                                'Special Tool to Find the Sessions',
+                                'How to Find Sessions Liquidity Points?',
+                                'How to Use FVG, iFVG for Entry?',
+                                'How to Set TP, SL, Breakeven, Trailing SL for A+ Model?'
+                            ],
+                            // MODIFICATION END
+                            youtubeId: 'poHWu3j8ESA', // <-- Replace with your YouTube Video ID
+                            duration: '35:35'
                         },
                         // Add more lecture objects here for the rest of your course
                     ],
@@ -185,20 +267,9 @@
             }
         </script>
 
-        <footer class="border-t border-gray-800">
-            <div class="container mx-auto px-6 py-8">
-                <div class="flex flex-col md:flex-row justify-between items-center">
-                    <div class="text-center md:text-left mb-4 md:mb-0">
-                        <p class="text-gray-400">© 2025 Trade with Plan. All Rights Reserved.</p>
-                        <p class="text-sm text-gray-500">Built for traders, by traders.</p>
-                    </div>
-                    <div class="flex space-x-6 text-sm">
-                        <a href="#" class="text-gray-400 hover:text-white transition-colors">Privacy Policy</a>
-                        <a href="#" class="text-gray-400 hover:text-white transition-colors">Terms of Service</a>
-                    </div>
-                </div>
-            </div>
-        </footer>
+        <!-- Footer (Loaded from footer.html)-->
+        {% include 'footer.html' %}
+        <!-- End of footer block -->
 
     </div>
 

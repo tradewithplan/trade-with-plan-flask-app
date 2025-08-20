@@ -453,6 +453,16 @@ def course1():
     return render_template('course1.html')
 
 
+@app.route('/course2')
+def course2():
+    return render_template('course2.html')
+
+
+@app.route('/course3')
+def course3():
+    return render_template('course3.html')
+
+
 if __name__ == '__main__':
     init_db()
     app.run(debug=True)
