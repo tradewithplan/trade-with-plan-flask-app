@@ -32,8 +32,6 @@ if not app.secret_key:
 # DATABASE_URL = os.environ.get('DATABASE_URL')
 DATABASE_URL = os.getenv('DATABASE_URL')
 
-print(DATABASE_URL)
-
 if not DATABASE_URL:
     raise ValueError("No DATABASE_URL set for Flask application")
 
