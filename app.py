@@ -19,11 +19,14 @@ import requests
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 
+load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = os.urandom(24)
+app.secret_key = os.getenv('SECRET_KEY')
 
-load_dotenv()
+# It's good practice to ensure the key was actually loaded
+if not app.secret_key:
+    raise ValueError("No SECRET_KEY set for Flask application. Did you create a .env file?")
 
 # 2. Get the database connection URL from environment variables
 # DATABASE_URL = os.environ.get('DATABASE_URL')
@@ -479,6 +482,100 @@ def login_and_purchase_required(course_name):
         return decorated_function
     return decorator
 
+# 1. Add this import at the top of your app.py file
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadTimeSignature
+
+# ... (rest of your app setup)
+
+# 2. Add these helper functions and new routes anywhere in app.py, 
+#    for example, after the logout() route.
+
+# --- START: FORGOT PASSWORD LOGIC ---
+
+def get_reset_token_serializer():
+    """Returns a serializer for generating and verifying password reset tokens."""
+    return URLSafeTimedSerializer(app.secret_key)
+
+def send_reset_email(user_email, token):
+    """Sends the password reset email."""
+    reset_url = url_for('reset_password', token=token, _external=True)
+    msg = Message(
+        'Password Reset Request - Trade with Plan',
+        sender=app.config['MAIL_USERNAME'],
+        recipients=[user_email]
+    )
+    msg.html = f"""
+    <html>
+        <body>
+            <h2>Password Reset Request</h2>
+            <p>You requested a password reset for your 'Trade with Plan' account.</p>
+            <p>Click the link below to set a new password. This link will expire in 1 hour.</p>
+            <p><a href="{reset_url}" style="padding: 10px 15px; background-color: #8b5cf6; color: white; text-decoration: none; border-radius: 5px;">Reset Password</a></p>
+            <p>If you did not make this request, please ignore this email.</p>
+            <p><em>The Trade with Plan Team</em></p>
+        </body>
+    </html>
+    """
+    mail.send(msg)
+
+@app.route('/forgot_password', methods=['GET', 'POST'])
+def forgot_password():
+    if request.method == 'POST':
+        email = request.form['email']
+        cur = get_db()
+        cur.execute("SELECT * FROM users WHERE email = %s", (email,))
+        user = cur.fetchone()
+
+        if user:
+            # Generate a token that includes the user's ID
+            serializer = get_reset_token_serializer()
+            token = serializer.dumps(user['id'], salt='password-reset-salt')
+            
+            # Send the email
+            send_reset_email(user['email'], token)
+
+        # Flash message regardless of whether user exists to prevent email enumeration
+        flash("If an account with that email exists, a password reset link has been sent.", "info")
+        return redirect(url_for('login'))
+
+    return render_template('forgot_password.html')
+
+
+@app.route('/reset_password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    serializer = get_reset_token_serializer()
+    try:
+        # Verify the token and get the user ID. Max age is 3600 seconds (1 hour).
+        user_id = serializer.loads(token, salt='password-reset-salt', max_age=3600)
+    except (SignatureExpired, BadTimeSignature):
+        flash("The password reset link is invalid or has expired.", "error")
+        return redirect(url_for('forgot_password'))
+
+    if request.method == 'POST':
+        password = request.form['password']
+        confirm_password = request.form['confirm-password']
+
+        if password != confirm_password:
+            flash("Passwords do not match.", "error")
+            return render_template('reset_password.html', token=token)
+
+        strength_error = is_strong_password(password)
+        if strength_error:
+            flash(strength_error, "error")
+            return render_template('reset_password.html', token=token)
+
+        # Hash the new password and update the database
+        hashed_password = generate_password_hash(password)
+        cur = get_db()
+        cur.execute("UPDATE users SET password = %s WHERE id = %s", (hashed_password, user_id))
+        cur.connection.commit()
+
+        flash("Your password has been updated successfully. You can now log in.", "success")
+        return redirect(url_for('login'))
+
+    return render_template('reset_password.html', token=token)
+
+# --- END: FORGOT PASSWORD LOGIC ---
 
 @app.route('/course1')
 @login_and_purchase_required('ICT "Forever Model"')
@@ -497,6 +594,13 @@ def course2():
 def course3():
     return render_template('course3.html')
 
+@app.route('/forgotpassword')
+def course3():
+    return render_template('forgot_password.html')
+
+@app.route('/resetpassword')
+def course3():
+    return render_template('reset_password.html')
 
 if __name__ == '__main__':
     init_db()
