@@ -594,14 +594,6 @@ def course2():
 def course3():
     return render_template('course3.html')
 
-@app.route('/forgotpassword')
-def course3():
-    return render_template('forgot_password.html')
-
-@app.route('/resetpassword')
-def course3():
-    return render_template('reset_password.html')
-
 if __name__ == '__main__':
     init_db()
     app.run(debug=True)
