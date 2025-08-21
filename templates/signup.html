@@ -64,7 +64,7 @@
             </div>
 
             <!-- Signup form -->
-            <form action="/signup" method="POST" class="space-y-6">
+            <form id="signup-form" action="/signup" method="POST" class="space-y-6">
 
                 <!-- Full Name input -->
                 <div>
@@ -156,6 +156,33 @@
 
     <!-- Scripts -->
     <script>
+        // Add this at the top of your script with the other constants
+        const form = document.getElementById('signup-form');
+
+        // --- (keep your existing code) ---
+
+        // This new function checks if all password requirements are met
+        const areAllRequirementsMet = () => {
+            const password = passwordInput.value;
+            for (const key in validationRegex) {
+                if (!validationRegex[key].test(password)) {
+                    return false; // Return false if any requirement fails
+                }
+            }
+            return true; // All good
+        };
+
+        // Add this event listener at the end of the DOMContentLoaded block
+        form.addEventListener('submit', (event) => {
+            const passwordsMatch = passwordInput.value === confirmPasswordInput.value;
+            const requirementsMet = areAllRequirementsMet();
+
+            if (!passwordsMatch || !requirementsMet) {
+                event.preventDefault(); // Stop the form from submitting!
+                alert('Please ensure your password meets all requirements and that both fields match.');
+            }
+        });
+        
         // Run once DOM is ready
         document.addEventListener('DOMContentLoaded', () => {
             // Input fields
@@ -195,18 +222,20 @@
 
             // Checks if passwords match and updates message
             const checkPasswordMatch = () => {
-                if (confirmPasswordInput.value === '' && passwordInput.value === '') {
+                // If the confirm password field is empty, clear any message and exit.
+                if (confirmPasswordInput.value === '') {
                     matchIndicator.textContent = '';
                     return;
                 }
-                if (confirmPasswordInput.value !== '' && passwordInput.value === confirmPasswordInput.value) {
+
+                if (passwordInput.value === confirmPasswordInput.value) {
                     matchIndicator.textContent = '✓ Passwords match';
-                    matchIndicator.classList.add(validClass);
-                    matchIndicator.classList.remove(errorClass);
+                    matchIndicator.classList.add('text-green-500');
+                    matchIndicator.classList.remove('text-red-500');
                 } else {
                     matchIndicator.textContent = '✗ Passwords do not match';
-                    matchIndicator.classList.add(errorClass);
-                    matchIndicator.classList.remove(validClass);
+                    matchIndicator.classList.add('text-red-500');
+                    matchIndicator.classList.remove('text-green-500');
                 }
             };
 
