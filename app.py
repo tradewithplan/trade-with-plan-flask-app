@@ -604,28 +604,86 @@ def reset_password(token):
 # -------- NEW ADMIN ROUTES -----------
 # -------------------------------------
 
+# --- MODIFIED: Admin Dashboard with Filtering ---
 @app.route('/admin')
 @admin_required
 def admin_dashboard():
-    """Renders the admin dashboard with lists of users and purchases."""
+    """Renders the admin dashboard with lists of users and purchases, including filtering."""
     cur = get_db()
     
-    # Fetch all users
-    cur.execute("SELECT * FROM users ORDER BY id ASC")
+    # Get filter terms from the URL query parameters
+    user_filter = request.args.get('user_filter', '').strip()
+    purchase_filter = request.args.get('purchase_filter', '').strip()
+    
+    # --- Fetch users with optional filtering ---
+    users_query = "SELECT * FROM users"
+    params = []
+    if user_filter:
+        users_query += " WHERE fullname ILIKE %s OR email ILIKE %s"
+        params.extend([f"%{user_filter}%", f"%{user_filter}%"])
+    users_query += " ORDER BY id ASC"
+    cur.execute(users_query, tuple(params))
     users = cur.fetchall()
     
-    # Fetch all purchases with associated user details
-    cur.execute("""
+    # --- Fetch purchases with optional filtering ---
+    purchases_query = """
         SELECT 
             p.id, p.course_name, p.purchase_date,
             u.id AS user_id, u.fullname, u.email
         FROM purchases p
         JOIN users u ON p.user_id = u.id
-        ORDER BY p.purchase_date DESC
-    """)
+    """
+    params = []
+    if purchase_filter:
+        purchases_query += " WHERE u.fullname ILIKE %s OR u.email ILIKE %s OR p.course_name ILIKE %s"
+        params.extend([f"%{purchase_filter}%", f"%{purchase_filter}%", f"%{purchase_filter}%"])
+    purchases_query += " ORDER BY p.purchase_date DESC"
+    cur.execute(purchases_query, tuple(params))
     purchases = cur.fetchall()
     
-    return render_template('admin.html', users=users, purchases=purchases)
+    return render_template('admin.html', 
+                           users=users, 
+                           purchases=purchases, 
+                           user_filter=user_filter, 
+                           purchase_filter=purchase_filter)
+
+
+# --- NEW: Route to handle editing a user (both GET and POST) ---
+@app.route('/admin/edit-user/<int:user_id>', methods=['GET', 'POST'])
+@admin_required
+def edit_user(user_id):
+    cur = get_db()
+
+    # Fetch the user to edit
+    cur.execute("SELECT * FROM users WHERE id = %s", (user_id,))
+    user = cur.fetchone()
+    if not user:
+        flash("User not found.", "error")
+        return redirect(url_for('admin_dashboard'))
+
+    if request.method == 'POST':
+        new_fullname = request.form['fullname']
+        new_email = request.form['email']
+
+        # Check if the new email is already taken by another user
+        cur.execute("SELECT id FROM users WHERE email = %s AND id != %s", (new_email, user_id))
+        if cur.fetchone():
+            flash("That email address is already in use by another user.", "error")
+            return render_template('edit_user.html', user=user)
+
+        # Update the user's information
+        try:
+            cur.execute("UPDATE users SET fullname = %s, email = %s WHERE id = %s",
+                        (new_fullname, new_email, user_id))
+            cur.connection.commit()
+            flash(f"User {user_id} has been updated successfully.", "success")
+            return redirect(url_for('admin_dashboard'))
+        except Exception as e:
+            get_db().connection.rollback()
+            flash(f"An error occurred while updating user: {e}", "error")
+
+    return render_template('edit_user.html', user=user)
+
 
 
 @app.route('/admin/delete-user/<int:user_id>', methods=['POST'])

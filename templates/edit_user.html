@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit User - Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0a0a0a;
+            color: #e2e8f0;
+        }
+        .gradient-text {
+            background: linear-gradient(90deg, #a78bfa, #6b21a8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="antialiased flex items-center justify-center min-h-screen">
+
+    <div id="flash-messages-container" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 w-full max-w-md px-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message flex justify-between items-center p-4 mb-4 text-sm rounded-lg shadow-lg
+                    {% if category == 'error' %} bg-red-900 text-red-300 {% else %} bg-blue-900 text-blue-300 {% endif %}"
+                    role="alert">
+                    <span>{{ message }}</span>
+                    <button type="button" class="ml-auto -mx-1.5 -my-1.5 bg-transparent text-current rounded-lg p-1.5 hover:bg-gray-800/50 inline-flex h-8 w-8" data-dismiss-target>
+                        <span class="sr-only">Dismiss</span>
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                    </button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <div class="w-full max-w-md bg-gray-900 rounded-lg shadow-lg p-8">
+        <h1 class="text-2xl font-bold text-center mb-6">
+            Edit User <span class="gradient-text">#{{ user.id }}</span>
+        </h1>
+        
+        <form method="post" action="{{ url_for('edit_user', user_id=user.id) }}" class="space-y-6">
+            <div>
+                <label for="fullname" class="block text-sm font-medium text-gray-400">Full Name</label>
+                <input type="text" name="fullname" id="fullname" value="{{ user.fullname }}" required
+                       class="mt-1 block w-full p-3 rounded-md bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500">
+            </div>
+            
+            <div>
+                <label for="email" class="block text-sm font-medium text-gray-400">Email Address</label>
+                <input type="email" name="email" id="email" value="{{ user.email }}" required
+                       class="mt-1 block w-full p-3 rounded-md bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500">
+            </div>
+            
+            <div class="flex items-center justify-between gap-4 pt-2">
+                <a href="{{ url_for('admin_dashboard') }}" class="w-full text-center bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 rounded-lg transition-colors">
+                    Cancel
+                </a>
+                <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 rounded-lg transition-colors">
+                    Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+
+     </body>
+</html>
