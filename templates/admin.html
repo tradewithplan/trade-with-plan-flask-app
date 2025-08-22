@@ -28,7 +28,7 @@
 </head>
 <body class="antialiased">
 
-    <div id="flash-messages-container" class="fixed top-15 left-1/2 -translate-x-1/2 z-50 w-full max-w-xl px-6">
+    <div id="flash-messages-container" class="fixed top-5 left-5 z-50 w-full max-w-md">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
@@ -168,5 +168,30 @@
             </section>
         </main>
     </div>
-    </body>
+
+    <script>
+        function dismissMessage(element) {
+            if (!element) return;
+            element.style.transition = 'opacity 0.5s ease-out';
+            element.style.opacity = '0';
+            setTimeout(() => {
+                element.remove();
+            }, 500);
+        }
+
+        const flashMessages = document.querySelectorAll('.flash-message');
+
+        flashMessages.forEach(message => {
+            const closeButton = message.querySelector('[data-dismiss-target]');
+            if (closeButton) {
+                closeButton.addEventListener('click', () => {
+                    dismissMessage(message);
+                });
+            }
+            setTimeout(() => {
+                dismissMessage(message);
+            }, 4000); // Message will disappear after 4 seconds
+        });
+    </script>
+</body>
 </html>
