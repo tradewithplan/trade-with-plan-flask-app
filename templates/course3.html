@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Course: Basic to Advanced - Trade with Plan</title>
+    <title>1-1 Personal Mentorship - Trade with Plan</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -14,7 +14,6 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     <style>
-        /* Reusing your custom styles for consistency */
         body {
             font-family: 'Inter', sans-serif;
             background-color: #0a0a0a;
@@ -26,23 +25,6 @@
             -webkit-text-fill-color: transparent;
             font-size: inherit;
             font-weight: inherit;
-        }
-        /* Custom scrollbar for the course playlist */
-        .course-content-scroll::-webkit-scrollbar {
-            width: 8px;
-        }
-        .course-content-scroll::-webkit-scrollbar-track {
-            background: #1e1e1e; /* Darker track for contrast */
-        }
-        .course-content-scroll::-webkit-scrollbar-thumb {
-            background-color: #8b5cf6;
-            border-radius: 10px;
-            border: 2px solid transparent;
-            background-clip: content-box;
-        }
-        .course-content-scroll {
-            scrollbar-width: thin;
-            scrollbar-color: #8b5cf6 #1e1e1e;
         }
     </style>
 </head>
@@ -58,20 +40,17 @@
                             <span class="text-white">Trade</span><span class="text-purple-600 gradient-text">with</span><span class="text-white">Plan</span>
                         </span>
                     </a>
-
                     <div class="hidden md:flex items-center space-x-8">
                         <a href="/#features" class="text-gray-300 hover:text-purple-500 transition-colors">Features</a>
                         <a href="/#pricing" class="text-gray-300 hover:text-purple-500 transition-colors">Pricing</a>
                         <a href="{{ url_for('logout') }}" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors">Logout</a>
                     </div>
-
                     <div class="md:hidden">
                         <button @click="mobileMenuOpen = !mobileMenuOpen" class="text-white focus:outline-none">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
                         </button>
                     </div>
                 </div>
-
                 <div x-show="mobileMenuOpen" @click.away="mobileMenuOpen = false" class="md:hidden mt-4 space-y-4" x-transition>
                     <a href="/#features" class="block text-gray-300 hover:text-purple-500 transition-colors">Features</a>
                     <a href="/#pricing" class="block text-gray-300 hover:text-purple-500 transition-colors">Pricing</a>
@@ -80,152 +59,56 @@
             </nav>
         </header>
 
-        <main class="flex-grow container mx-auto px-4 sm:px-6 py-8">
-
-            <div x-data="coursePlayer()" x-init="init()" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-                <div class="lg:col-span-2">
+        <main class="flex-grow flex items-center justify-center">
+            <div class="container mx-auto px-6 py-16 text-center">
+                
+                <div class="max-w-4xl mx-auto bg-gray-900 border border-gray-800 rounded-2xl p-8 md:p-12 shadow-2xl shadow-purple-900/20">
                     
-                    <div class="rounded-lg overflow-hidden shadow-2xl shadow-purple-900/20 border border-gray-800 h-[300px] sm:h-[400px] md:h-[500px] lg:h-[600px]">
-                        <iframe
-                            :src="`https://www.youtube-nocookie.com/embed/${currentVideo.youtubeId}?rel=0`"
-                            title="YouTube video player"
-                            frameborder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                            allowfullscreen
-                            class="w-full h-full">
-                        </iframe>
-                    </div>
+                    <h1 class="text-3xl md:text-4xl font-extrabold text-white leading-tight">
+                        Welcome to Your <span class="gradient-text">1-1 Personal Mentorship</span>!
+                    </h1>
 
-                    <div class="mt-6 p-6 bg-gray-900 border border-gray-800 rounded-lg">
-                        <h1 class="text-2xl md:text-3xl font-bold text-white mb-2" x-text="currentVideo.title"></h1>
-                        <div class="text-gray-400 mt-4">
-                            <h4 class="font-semibold text-gray-300 mb-2">Topic covered in this session:</h4>
-                            <ul class="list-disc list-inside space-y-1">
-                                <template x-for="topic in currentVideo.description" :key="topic">
-                                    <li x-text="topic"></li>
-                                </template>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
+                    <p class="text-lg text-gray-400 mt-4">
+                        Hi, **{{ session['user_name'] }}**! Congratulations on taking this huge step toward mastering the markets. I'm excited to start working with you personally.
+                    </p>
 
-                <div class="lg:col-span-1">
-                    <div class="bg-gray-900 border border-gray-800 rounded-lg h-full flex flex-col">
-                        <div class="p-4 border-b border-gray-700">
-                            <h2 class="text-xl font-bold text-white" x-text="courseTitle"></h2>
-                            <p class="text-sm text-gray-400">
-                                <span x-text="currentVideo.id"></span> / <span x-text="lectures.length"></span> Lectures
-                            </p>
-                        </div>
+                    <div class="my-8 border-t border-gray-700"></div>
 
-                        <ul class="course-content-scroll flex-grow overflow-y-auto">
-                            <template x-for="lecture in lectures" :key="lecture.id">
-                                <li @click="selectVideo(lecture)"
-                                    class="flex items-start p-4 cursor-pointer hover:bg-purple-900/30 transition-colors duration-200"
-                                    :class="{'bg-purple-800/50 border-l-4 border-purple-500': currentVideo.id === lecture.id}">
-                                    
-                                    <div class="text-2xl font-bold mr-4"
-                                         :class="currentVideo.id === lecture.id ? 'text-purple-400' : 'text-gray-500'"
-                                         x-text="lecture.id.toString().padStart(2, '0')">
-                                    </div>
+                    <h2 class="text-2xl font-bold text-white mb-4">Let's Get Started: Your Next Steps</h2>
+                    <p class="text-gray-400 mb-6">To schedule our first session and begin your personalized training, please follow these simple steps:</p>
+                    
+                    <ol class="text-left max-w-lg mx-auto space-y-4 text-gray-300">
+                        <li class="flex items-start">
+                            <span class="bg-purple-600 text-white font-bold rounded-full h-6 w-6 flex items-center justify-center mr-4 flex-shrink-0">1</span>
+                            <span>Have a **screenshot** of your payment confirmation ready.</span>
+                        </li>
+                        <li class="flex items-start">
+                             <span class="bg-purple-600 text-white font-bold rounded-full h-6 w-6 flex items-center justify-center mr-4 flex-shrink-0">2</span>
+                            <span>Click the button below to connect with me directly on WhatsApp.</span>
+                        </li>
+                         <li class="flex items-start">
+                             <span class="bg-purple-600 text-white font-bold rounded-full h-6 w-6 flex items-center justify-center mr-4 flex-shrink-0">3</span>
+                            <span>Send the pre-filled message along with your **registered email address** and the **payment screenshot**.</span>
+                        </li>
+                    </ol>
 
-                                    <div>
-                                        <h3 class="font-semibold" :class="{'text-white': currentVideo.id === lecture.id, 'text-gray-300': currentVideo.id !== lecture.id}" x-text="lecture.title"></h3>
-                                        <p class="text-xs text-gray-500" x-text="lecture.duration"></p>
-                                    </div>
-                                </li>
-                            </template>
-                        </ul>
+                    <div class="mt-10">
+                        <a href="https://wa.me/918870284043?text=Hello!%20I've%20purchased%20the%201-1%20Personal%20Mentorship%20course%20on%20Trade%20with%20Plan.%20I'm%20ready%20to%20schedule%20my%20first%20session." 
+                           target="_blank" 
+                           rel="noopener noreferrer"
+                           class="inline-flex items-center justify-center gap-3 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg text-lg transition-transform hover:scale-105">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-whatsapp" viewBox="0 0 16 16">
+                                <path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232"/>
+                            </svg>
+                            <span>Chat With Mentor</span>
+                        </a>
                     </div>
                 </div>
+
             </div>
         </main>
         
-        <script>
-            function coursePlayer() {
-                return {
-                    // 1. CHANGE THE COURSE TITLE
-                    courseTitle: 'ICT FOREVER MODEL',
-
-                    // 2. CHANGE THE LIST OF LECTURES AND YOUTUBE VIDEO IDs
-                    lectures: [
-                        {
-                            id: 1,
-                            title: 'Session 1',
-                            // MODIFICATION START: Description is now an array of strings
-                            description: [
-                                'What is Liquidity (BSL, SSL)?'
-                            ],
-                            // MODIFICATION END
-                            youtubeId: '9Q3x-fbaM7M', // <-- Replace with your YouTube Video ID
-                            duration: '09:09'
-                        },
-                        {
-                            id: 2,
-                            title: 'Session 2',
-                            // MODIFICATION START: Description is now an array of strings
-                            description: [
-                                'How to find Right FVG, iFVG?'
-                            ],
-                            // MODIFICATION END
-                            youtubeId: '2diIO16ecx8', // <-- Replace with your YouTube Video ID
-                            duration: '11:39'
-                        },
-                        {
-                            id: 3,
-                            title: 'Session 3',
-                            // MODIFICATION START: Description is now an array of strings
-                            description: [
-                                'What is iFVG and What is different between FVG & iFVG?',
-                                'How to Find Trading BIAS?',
-                                'Three Time frame layer Analysis of Liquidity',
-                                'Where and how to take entry using the PD Arrays (FVG, iFVG)?'
-                            ],
-                            // MODIFICATION END
-                            youtubeId: 'HF5HlOijxGI', // <-- Replace with your YouTube Video ID
-                            duration: '09:43'
-                        },
-                        {
-                            id: 4,
-                            title: 'Session 4',
-                            // MODIFICATION START: Description is now an array of strings
-                            description: [
-                                'Complete Setup will be Explained (TP, SL, BE, RR)'
-                            ],
-                            // MODIFICATION END
-                            youtubeId: 'A8cYr_ZPJaE', // <-- Replace with your YouTube Video ID
-                            duration: '24:22'
-                        },
-                        {
-                            id: 5,
-                            title: 'Session 5',
-                            // MODIFICATION START: Description is now an array of strings
-                            description: [
-                                'Risk management, Psychology'
-                            ],
-                            // MODIFICATION END
-                            youtubeId: 'GN-7sVcDPkU', // <-- Replace with your YouTube Video ID
-                            duration: '10:06'
-                        },
-                        // Add more lecture objects here for the rest of your course
-                    ],
-                    currentVideo: {},
-                    init() {
-                        // Set the first video as the current one on page load
-                        this.currentVideo = this.lectures[0];
-                    },
-                    selectVideo(lecture) {
-                        this.currentVideo = lecture;
-                    }
-                }
-            }
-        </script>
-
-        <!-- Footer (Loaded from footer.html)-->
         {% include 'footer.html' %}
-        <!-- End of footer block -->
-
     </div>
 
 </body>
