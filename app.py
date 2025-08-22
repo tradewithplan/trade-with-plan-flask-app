@@ -604,28 +604,51 @@ def reset_password(token):
 # -------- NEW ADMIN ROUTES -----------
 # -------------------------------------
 
-# --- MODIFIED: Admin Dashboard with Filtering ---
+# --- Admin Dashboard with Filtering AND Sorting ---
 @app.route('/admin')
 @admin_required
 def admin_dashboard():
-    """Renders the admin dashboard with lists of users and purchases, including filtering."""
+    """Renders the admin dashboard with lists of users and purchases, including filtering and sorting."""
     cur = get_db()
     
-    # Get filter terms from the URL query parameters
+    # --- Get filter and sort parameters from the URL ---
     user_filter = request.args.get('user_filter', '').strip()
     purchase_filter = request.args.get('purchase_filter', '').strip()
+    sort_by = request.args.get('sort_by', 'id') # Default sort column
+    order = request.args.get('order', 'asc') # Default sort order
     
-    # --- Fetch users with optional filtering ---
+    # --- Security: Validate sort parameters to prevent SQL injection ---
+    # Whitelist of columns that are allowed to be sorted
+    user_sortable_columns = ['id', 'fullname', 'email']
+    purchase_sortable_columns = ['id', 'fullname', 'email', 'course_name', 'purchase_date']
+    
+    # Check if the requested sort column is in the appropriate whitelist
+    is_user_sort = sort_by in user_sortable_columns
+    is_purchase_sort = sort_by in purchase_sortable_columns
+    
+    # Default to a safe column if an invalid one is provided
+    if not (is_user_sort or is_purchase_sort):
+        sort_by = 'id'
+        
+    # Ensure order is either 'asc' or 'desc'
+    if order not in ['asc', 'desc']:
+        order = 'asc'
+
+    # --- Fetch users with filtering and sorting ---
     users_query = "SELECT * FROM users"
     params = []
     if user_filter:
         users_query += " WHERE fullname ILIKE %s OR email ILIKE %s"
         params.extend([f"%{user_filter}%", f"%{user_filter}%"])
-    users_query += " ORDER BY id ASC"
+    
+    if is_user_sort:
+        # Safely add the validated sort parameters to the query
+        users_query += f" ORDER BY {sort_by} {order.upper()}"
+        
     cur.execute(users_query, tuple(params))
     users = cur.fetchall()
     
-    # --- Fetch purchases with optional filtering ---
+    # --- Fetch purchases with filtering and sorting ---
     purchases_query = """
         SELECT 
             p.id, p.course_name, p.purchase_date,
@@ -637,7 +660,14 @@ def admin_dashboard():
     if purchase_filter:
         purchases_query += " WHERE u.fullname ILIKE %s OR u.email ILIKE %s OR p.course_name ILIKE %s"
         params.extend([f"%{purchase_filter}%", f"%{purchase_filter}%", f"%{purchase_filter}%"])
-    purchases_query += " ORDER BY p.purchase_date DESC"
+    
+    if is_purchase_sort:
+        # Safely add the validated sort parameters to the query
+        purchases_query += f" ORDER BY {sort_by} {order.upper()}"
+    else:
+        # Default sort for purchases if no valid sort is specified
+        purchases_query += " ORDER BY purchase_date DESC"
+
     cur.execute(purchases_query, tuple(params))
     purchases = cur.fetchall()
     
@@ -645,7 +675,9 @@ def admin_dashboard():
                            users=users, 
                            purchases=purchases, 
                            user_filter=user_filter, 
-                           purchase_filter=purchase_filter)
+                           purchase_filter=purchase_filter,
+                           sort_by=sort_by,
+                           order=order)
 
 
 # --- NEW: Route to handle editing a user (both GET and POST) ---
