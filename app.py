@@ -111,6 +111,27 @@ app.config['GOOGLE_CLIENT_ID'] = os.getenv('GOOGLE_CLIENT_ID') # Get client ID f
 # Initialize the Mail instance
 mail = Mail(app)
 
+# --- NEW: Custom Jinja filter to format UTC datetime to IST ---
+def format_to_ist(utc_dt):
+    """Takes a naive UTC datetime and converts it to a formatted IST string."""
+    if not utc_dt:
+        return "" # Return empty string if datetime is None
+    
+    utc_tz = pytz.timezone('UTC')
+    ist_tz = pytz.timezone('Asia/Kolkata')
+    
+    # Make the naive datetime object from the database timezone-aware (as UTC)
+    aware_utc_dt = utc_tz.localize(utc_dt)
+    
+    # Convert it to the IST timezone
+    ist_dt = aware_utc_dt.astimezone(ist_tz)
+    
+    # Return the formatted string
+    return ist_dt.strftime('%d %b %Y, %I:%M %p')
+
+# Register the custom filter with the Jinja environment
+app.jinja_env.filters['format_ist'] = format_to_ist
+
 # ---------- Decorators ----------
 def login_required(f):
     """
