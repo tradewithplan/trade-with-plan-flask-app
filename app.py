@@ -19,6 +19,9 @@ import requests
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 
+# Added imports for admin functionality
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadTimeSignature
+
 load_dotenv()
 
 app = Flask(__name__)
@@ -122,6 +125,20 @@ def login_required(f):
             return redirect(url_for('login'))
         return f(*args, **kwargs)
 
+    return decorated_function
+
+# --- NEW DECORATOR: Requires admin privileges ---
+def admin_required(f):
+    """
+    Decorates routes to require admin status.
+    Checks for the 'is_admin' session variable.
+    """
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get('is_admin'):
+            flash("You do not have permission to view this page.", "error")
+            return redirect(url_for('home'))
+        return f(*args, **kwargs)
     return decorated_function
 
 
@@ -291,6 +308,13 @@ def login():
             if check_password_hash(user['password'], password):
                 session['user_id'] = user['id']
                 session['user_name'] = user['fullname']
+                
+                # --- NEW ADMIN CHECK ---
+                if email == app.config['ADMIN_EMAIL']:
+                    session['is_admin'] = True
+                    flash("Admin login successful!", "success")
+                    return redirect(url_for('admin_dashboard'))
+                
                 flash("Login successful!", "success")
                 return redirect(url_for('home'))
         # Either user not found or password invalid
@@ -486,7 +510,7 @@ from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadTimeSignat
 # ... (rest of your app setup)
 
 # 2. Add these helper functions and new routes anywhere in app.py, 
-#    for example, after the logout() route.
+#     for example, after the logout() route.
 
 # --- START: FORGOT PASSWORD LOGIC ---
 
@@ -574,6 +598,99 @@ def reset_password(token):
     return render_template('reset_password.html', token=token)
 
 # --- END: FORGOT PASSWORD LOGIC ---
+
+
+# -------------------------------------
+# -------- NEW ADMIN ROUTES -----------
+# -------------------------------------
+
+@app.route('/admin')
+@admin_required
+def admin_dashboard():
+    """Renders the admin dashboard with lists of users and purchases."""
+    cur = get_db()
+    
+    # Fetch all users
+    cur.execute("SELECT * FROM users ORDER BY id ASC")
+    users = cur.fetchall()
+    
+    # Fetch all purchases with associated user details
+    cur.execute("""
+        SELECT 
+            p.id, p.course_name, p.purchase_date,
+            u.id AS user_id, u.fullname, u.email
+        FROM purchases p
+        JOIN users u ON p.user_id = u.id
+        ORDER BY p.purchase_date DESC
+    """)
+    purchases = cur.fetchall()
+    
+    return render_template('admin.html', users=users, purchases=purchases)
+
+
+@app.route('/admin/delete-user/<int:user_id>', methods=['POST'])
+@admin_required
+def delete_user(user_id):
+    """Deletes a user and all their purchases."""
+    cur = get_db()
+    try:
+        # First, delete all purchases associated with the user
+        cur.execute("DELETE FROM purchases WHERE user_id = %s", (user_id,))
+        # Then, delete the user
+        cur.execute("DELETE FROM users WHERE id = %s", (user_id,))
+        cur.connection.commit()
+        flash(f"User ID {user_id} and all their purchases have been deleted.", "success")
+    except Exception as e:
+        get_db().connection.rollback()
+        flash(f"An error occurred while deleting user: {e}", "error")
+    return redirect(url_for('admin_dashboard'))
+
+
+@app.route('/admin/add-purchase', methods=['POST'])
+@admin_required
+def add_purchase():
+    """Manually adds a purchase for a user via their email."""
+    user_email = request.form.get('user_email')
+    course_name = request.form.get('course_name')
+    
+    cur = get_db()
+    try:
+        cur.execute("SELECT id FROM users WHERE email = %s", (user_email,))
+        user_id_row = cur.fetchone()
+        
+        if not user_id_row:
+            flash(f"User with email '{user_email}' not found.", "error")
+            return redirect(url_for('admin_dashboard'))
+
+        user_id = user_id_row['id']
+        
+        cur.execute("INSERT INTO purchases (user_id, course_name) VALUES (%s, %s)",
+                    (user_id, course_name))
+        cur.connection.commit()
+        flash(f"Manually added '{course_name}' purchase for user '{user_email}'.", "success")
+    except psycopg2.errors.UniqueViolation:
+        get_db().connection.rollback()
+        flash(f"User '{user_email}' already owns the '{course_name}' course.", "warning")
+    except Exception as e:
+        get_db().connection.rollback()
+        flash(f"An error occurred while adding purchase: {e}", "error")
+    return redirect(url_for('admin_dashboard'))
+
+
+@app.route('/admin/delete-purchase/<int:purchase_id>', methods=['POST'])
+@admin_required
+def delete_purchase(purchase_id):
+    """Deletes a specific purchase record."""
+    cur = get_db()
+    try:
+        cur.execute("DELETE FROM purchases WHERE id = %s", (purchase_id,))
+        cur.connection.commit()
+        flash(f"Purchase ID {purchase_id} has been deleted.", "success")
+    except Exception as e:
+        get_db().connection.rollback()
+        flash(f"An error occurred while deleting purchase: {e}", "error")
+    return redirect(url_for('admin_dashboard'))
+
 
 @app.route('/course1')
 @login_and_purchase_required('ICT "Forever Model"')
