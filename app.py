@@ -307,7 +307,6 @@ def google_login():
 # --- 4. MODIFY THE LOGIN ROUTE FOR GOOGLE USERS ---
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    # If already logged in, redirect to home
     if 'user_id' in session:
         return redirect(url_for('home'))
     
@@ -315,37 +314,40 @@ def login():
         email = request.form['email']
         password = request.form['password']
         cur = get_db()
-        # Fetch user details for entered email
         cur.execute("SELECT * FROM users WHERE email = %s", (email,))
         user = cur.fetchone()
+
+        # CORRECTED LOGIC FLOW STARTS HERE
         if user:
-            # --- IMPORTANT CHECK: Handle Google SSO users ---
-            # If password is set as Google SSO placeholder, prevent normal login
+            # First, check if the user signed up with Google.
             if user['password'] == 'GOOGLE_SSO':
-                flash("This account was created with Google. Please use the 'Sign in with Google' button.", "error")
+                flash("This account was created with Google. Please use the 'Sign in with Google' button.", "warning")
                 return redirect(url_for('login'))
             
-            # Normal password authentication for standard users
+            # If not a Google user, then check the password.
             if check_password_hash(user['password'], password):
                 session['user_id'] = user['id']
                 session['user_name'] = user['fullname']
                 
-                # --- NEW ADMIN CHECK ---
-                if email == app.config['ADMIN_EMAIL']:
-                    session['is_admin'] = True
+                # --- ROLE ASSIGNMENT LOGIC ---
+                if email == app.config.get('ADMIN_EMAIL'):
+                    session['role'] = 'admin'
                     flash("Admin login successful!", "success")
                     return redirect(url_for('admin_dashboard'))
-                
-                flash("Login successful!", "success")
-                return redirect(url_for('home'))
-        # Either user not found or password invalid
+                elif email == app.config.get('SUPERVISOR_EMAIL'):
+                    session['role'] = 'supervisor'
+                    flash("Supervisor login successful!", "success")
+                    return redirect(url_for('admin_dashboard'))
+                else:
+                    session['role'] = 'user'
+                    flash("Login successful!", "success")
+                    return redirect(url_for('home'))
+
+        # This message now correctly shows if the user doesn't exist OR the password is wrong.
         flash("Invalid email or password.", "error")
         return redirect(url_for('login'))
     
-    # --- ADD THIS LINE TO PASS THE CLIENT ID ---
-    # Render login page with Google client ID for frontend use
-    return render_template('login.html', google_client_id=app.config['GOOGLE_CLIENT_ID']) 
-
+    return render_template('login.html', google_client_id=app.config['GOOGLE_CLIENT_ID'])
 
 @app.route('/logout')
 def logout():
@@ -407,6 +409,20 @@ def auth_google():
         # Log the error for debugging
         app.logger.error(f"Error during Google authentication: {e}")
         return {"success": False, "message": "An internal error occurred."}, 500
+
+
+# --- NEW DECORATOR: To grant dashboard access to both Admin and Supervisor ---
+def dashboard_access_required(f):
+    """Decorates routes to require either 'admin' or 'supervisor' role."""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if session.get('role') not in ['admin', 'supervisor']:
+            flash("You do not have permission to view this page.", "error")
+            return redirect(url_for('home'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+
 
 
 # 5. New route to handle course purchases
@@ -627,7 +643,7 @@ def reset_password(token):
 
 # --- Admin Dashboard with Filtering AND Sorting ---
 @app.route('/admin')
-@admin_required
+@dashboard_access_required
 def admin_dashboard():
     """Renders the admin dashboard with lists of users and purchases, including filtering and sorting."""
     cur = get_db()
