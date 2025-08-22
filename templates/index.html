@@ -278,7 +278,7 @@
                         <!-- Mentor Info -->
                         <div class="text-center lg:text-left">
                             <h3 class="text-xl sm:text-2xl mb-3">
-                                <span class="gradient-text font-bold">Naveen Kumar</span>
+                                <span class="gradient-text font-bold">L Naveen Kumar</span>
                             </h3>
                             <p class="text-gray-400 mb-4 text-sm sm:text-base">
                                 Trading changed my life, but not overnight. Over the past five years I've learned that real success comes from understanding markets, not just predicting them. 
@@ -368,7 +368,7 @@
                                 </div>
                             {% else %}
                                 <form action="{{ url_for('purchase', course_name='ICT \"Forever Model\"') }}" method="post">
-                                    <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-lg transition-colors cta-buy-button">Choose Plan</button>
+                                    <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-lg transition-colors cta-buy-button">Buy Plan</button>
                                 </form>
                             {% endif %}
                         </div>
@@ -403,7 +403,7 @@
                                 </div>
                             {% else %}
                                 <form action="{{ url_for('purchase', course_name='Basic to Advanced') }}" method="post">
-                                    <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-lg transition-colors cta-buy-button">Choose Plan</button>
+                                    <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-lg transition-colors cta-buy-button">Buy Plan</button>
                                 </form>
                             {% endif %}
                         </div>
@@ -417,7 +417,7 @@
                         </p>
                         <ul class="space-y-4 text-gray-300 mb-8 flex-grow">
                                 <li class="flex items-start"><svg class="w-5 h-5 flex-shrink-0 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Everything in "Basic to Advanced"</li>
-                                <li class="flex items-start"><svg class="w-5 h-5 flex-shrink-0 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Free 5k Funded Account</li>
+                                <!-- <li class="flex items-start"><svg class="w-5 h-5 flex-shrink-0 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Free 5k Funded Account</li> -->
                                 <li class="flex items-start"><svg class="w-5 h-5 flex-shrink-0 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Funded Account Passing Assistance</li>
                                 <li class="flex items-start"><svg class="w-5 h-5 flex-shrink-0 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Personal Doubt Clearing Sessions</li>
                                 <li class="flex items-start"><svg class="w-5 h-5 flex-shrink-0 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Free 3-Months Premium Signals<br>(worth $89)</li>
@@ -437,7 +437,7 @@
                                 </div>
                             {% else %}
                                 <form action="{{ url_for('purchase', course_name='1-1 Personal Mentorship') }}" method="post">
-                                    <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-lg transition-colors cta-buy-button">Choose Plan</button>
+                                    <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-lg transition-colors cta-buy-button">Buy Plan</button>
                                 </form>
                             {% endif %}
                         </div>
@@ -656,7 +656,7 @@
                     courseCards.forEach(card => {
                         card.addEventListener('click', (event) => {
 
-                            // Check if the click happened on the 'Choose Plan' button or its container form.
+                            // Check if the click happened on the 'Buy Plan' button or its container form.
                             // The .closest() method checks the clicked element and its parents.
                             const isBuyButton = event.target.closest('.cta-buy-button');
 
