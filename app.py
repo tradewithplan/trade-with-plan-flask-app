@@ -330,11 +330,16 @@ def login():
                 session['user_name'] = user['fullname']
                 
                 # --- ROLE ASSIGNMENT LOGIC ---
-                if email == app.config.get('ADMIN_EMAIL'):
+
+                # --- MODIFICATION: Make email check case-insensitive ---
+                admin_email = app.config.get('ADMIN_EMAIL', '').lower()
+                supervisor_email = app.config.get('SUPERVISOR_EMAIL', '').lower()
+                
+                if email.lower() == admin_email:
                     session['role'] = 'admin'
                     flash("Admin login successful!", "success")
                     return redirect(url_for('admin_dashboard'))
-                elif email == app.config.get('SUPERVISOR_EMAIL'):
+                elif email.lower() == supervisor_email:
                     session['role'] = 'supervisor'
                     flash("Supervisor login successful!", "success")
                     return redirect(url_for('admin_dashboard'))
