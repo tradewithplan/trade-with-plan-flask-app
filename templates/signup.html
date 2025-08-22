@@ -34,6 +34,10 @@
             transform: translateY(-3px);
             box-shadow: 0 0 25px rgba(139, 92, 246, 0.5);
         }
+        /* Styles for password validation feedback */
+        .validation-item { transition: color 0.3s ease; }
+        .valid { color: #22c55e; } /* green-500 */
+        .invalid { color: #9ca3af; } /* gray-400 */
     </style>
 </head>
 <body class="antialiased">
@@ -81,21 +85,21 @@
                 </div>
 
                 <!-- Password input with validation -->
-                <div class="relative">
+                <div>
                     <label for="password" class="block text-sm font-medium text-gray-300">Password</label>
                     <input type="password" id="password" name="password" required
                         class="mt-2 block w-full rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:border-purple-500 focus:ring-purple-500 px-4 py-3" />
-                    
-                    <!-- Password strength criteria -->
-                    <div id="password-criteria"
-                        class="absolute top-full mt-2 w-full bg-gray-800 border border-gray-700 rounded-lg p-4 shadow-lg z-10 opacity-0 invisible scale-95 transform transition-all duration-200 ease-out space-y-1">
-                        <p id="length" class="text-gray-400 text-xs sm:text-sm">At least 8 characters</p>
-                        <p id="lowercase" class="text-gray-400 text-xs sm:text-sm">A lowercase letter</p>
-                        <p id="uppercase" class="text-gray-400 text-xs sm:text-sm">An uppercase letter</p>
-                        <p id="number" class="text-gray-400 text-xs sm:text-sm">A number</p>
-                        <p id="symbol" class="text-gray-400 text-xs sm:text-sm">A special character (!@#...)</p>
-                    </div>
                 </div>
+
+                <!-- Password Requirements Block -->
+                <div id="password-requirements" class="text-sm space-y-1">
+                    <p id="length" class="validation-item invalid">✓ At least 8 characters</p>
+                    <p id="lowercase" class="validation-item invalid">✓ At least one lowercase letter (a-z)</p>
+                    <p id="uppercase" class="validation-item invalid">✓ At least one uppercase letter (A-Z)</p>
+                    <p id="number" class="validation-item invalid">✓ At least one number (0-9)</p>
+                    <p id="special" class="validation-item invalid">✓ At least one special character (!@#$...)</p>
+                </div>
+                <!-- END: Password Requirements Block -->
 
                 <!-- Confirm password input -->
                 <div>
@@ -119,16 +123,7 @@
                 <div class="flex-grow h-px bg-gray-700"></div>
             </div>
 
-            <!-- Your Custom Google Sign-Up Button --
-            <button id="customGoogleBtn" class="w-full bg-gray-800 hover:bg-gray-700 text-white font-medium py-3 px-6 rounded-lg flex items-center justify-center space-x-3 transition-colors duration-200">
-                <img src="https://www.svgrepo.com/show/355037/google.svg" class="w-5 h-5" alt="Google Logo">
-                <span>Sign Up with Google</span>
-            </button> -->
-
-            <!-- 
-            Google One Tap & Sign In Logic (Required)
-            - The g_id_onload div initializes the service.
-            -->
+            <!-- Google One Tap & Sign In Logic (Required) -->
             <div id="g_id_onload"
                 data-client_id="{{ google_client_id }}"
                 data-context="signup"
@@ -156,66 +151,46 @@
 
     <!-- Scripts -->
     <script>
-        // Add this at the top of your script with the other constants
-        const form = document.getElementById('signup-form');
-
-        // --- (keep your existing code) ---
-
-        // This new function checks if all password requirements are met
-        const areAllRequirementsMet = () => {
-            const password = passwordInput.value;
-            for (const key in validationRegex) {
-                if (!validationRegex[key].test(password)) {
-                    return false; // Return false if any requirement fails
-                }
-            }
-            return true; // All good
-        };
-
-        // Add this event listener at the end of the DOMContentLoaded block
-        form.addEventListener('submit', (event) => {
-            const passwordsMatch = passwordInput.value === confirmPasswordInput.value;
-            const requirementsMet = areAllRequirementsMet();
-
-            if (!passwordsMatch || !requirementsMet) {
-                event.preventDefault(); // Stop the form from submitting!
-                alert('Please ensure your password meets all requirements and that both fields match.');
-            }
-        });
-        
-        // Run once DOM is ready
         document.addEventListener('DOMContentLoaded', () => {
             // Input fields
             const passwordInput = document.getElementById('password');
             const confirmPasswordInput = document.getElementById('confirm-password');
             const matchIndicator = document.getElementById('match-indicator');
-            const passwordCriteria = document.getElementById('password-criteria');
+            const form = document.getElementById('signup-form');
             
             // Password validation rules with regex and corresponding elements
-            const criteria = {
-                length: { el: document.getElementById('length'), regex: /.{8,}/ },
-                lowercase: { el: document.getElementById('lowercase'), regex: /[a-z]/ },
-                uppercase: { el: document.getElementById('uppercase'), regex: /[A-Z]/ },
-                number: { el: document.getElementById('number'), regex: /[0-9]/ },
-                symbol: { el: document.getElementById('symbol'), regex: /[!@#$%^&*(),.?":{}|<>]/ }
+            const requirements = {
+                length: document.getElementById('length'),
+                lowercase: document.getElementById('lowercase'),
+                uppercase: document.getElementById('uppercase'),
+                number: document.getElementById('number'),
+                special: document.getElementById('special')
+            };
+
+            const validationRegex = {
+                length: /.{8,}/,
+                lowercase: /[a-z]/,
+                uppercase: /[A-Z]/,
+                number: /[0-9]/,
+                special: /[!@#$%^&*(),.?":{}|<>]/
             };
 
             // CSS classes for feedback
-            const validClass = 'text-green-400';
-            const invalidClass = 'text-gray-400';
-            const errorClass = 'text-red-500';
+            const validClass = 'valid';
+            const invalidClass = 'invalid';
 
             // Updates password criteria colors based on validity
             const validatePassword = () => {
                 const password = passwordInput.value;
-                for (const key in criteria) {
-                    const criterion = criteria[key];
-                    if (criterion.regex.test(password)) {
-                        criterion.el.classList.add(validClass);
-                        criterion.el.classList.remove(invalidClass);
+                for (const key in requirements) {
+                    const element = requirements[key];
+                    const regex = validationRegex[key];
+                    if (regex.test(password)) {
+                        element.classList.remove(invalidClass);
+                        element.classList.add(validClass);
                     } else {
-                        criterion.el.classList.add(invalidClass);
-                        criterion.el.classList.remove(validClass);
+                        element.classList.remove(validClass);
+                        element.classList.add(invalidClass);
                     }
                 }
             };
@@ -239,22 +214,32 @@
                 }
             };
 
-            // Show password criteria on focus
-            passwordInput.addEventListener('focus', () => {
-                passwordCriteria.classList.remove('opacity-0', 'invisible', 'scale-95');
-                passwordCriteria.classList.add('opacity-100', 'visible', 'scale-100');
-            });
-
-            // Hide password criteria on blur
-            passwordInput.addEventListener('blur', () => {
-                passwordCriteria.classList.remove('opacity-100', 'visible', 'scale-100');
-                passwordCriteria.classList.add('opacity-0', 'invisible', 'scale-95');
-            });
+            // This function checks if all password requirements are met
+            const areAllRequirementsMet = () => {
+                const password = passwordInput.value;
+                for (const key in validationRegex) {
+                    if (!validationRegex[key].test(password)) {
+                        return false; // Return false if any requirement fails
+                    }
+                }
+                return true; // All good
+            };
 
             // Validate password and match on input events
             passwordInput.addEventListener('input', validatePassword);
             passwordInput.addEventListener('input', checkPasswordMatch);
             confirmPasswordInput.addEventListener('input', checkPasswordMatch);
+
+            // Form submission validation
+            form.addEventListener('submit', (event) => {
+                const passwordsMatch = passwordInput.value === confirmPasswordInput.value;
+                const requirementsMet = areAllRequirementsMet();
+
+                if (!passwordsMatch || !requirementsMet) {
+                    event.preventDefault(); // Stop the form from submitting!
+                    alert('Please ensure your password meets all requirements and that both fields match.');
+                }
+            });
         });
 
         // Google Sign-In Callback: Sends token to backend for verification
@@ -280,28 +265,5 @@
             });
         }
     </script>
-
-    <!-- JavaScript to link your button to Google's logic --
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Find your custom button
-        const customButton = document.getElementById('customGoogleBtn');
-    
-        // Add a click listener to your button
-        customButton.addEventListener('click', function() {
-            // Find the Google-rendered button's iframe inside the hidden div
-            // We use a small timeout to ensure Google's script has had time to render the button.
-            setTimeout(function() {
-                const googleButton = document.querySelector('.g_id_signin iframe');
-                if (googleButton) {
-                    googleButton.click();
-                } else {
-                    console.error('Google Sign-In button not found.');
-                }
-            }, 100); // 100ms delay
-        });
-    });
-    </script>  -->
-
 </body>
 </html>
