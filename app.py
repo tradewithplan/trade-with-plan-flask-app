@@ -105,6 +105,7 @@ app.config['MAIL_USERNAME'] = os.environ.get('EMAIL_USER') # Your email address
 app.config['MAIL_PASSWORD'] = os.environ.get('EMAIL_PASS') # Your App Password
 # ADD THIS LINE for the admin's email
 app.config['ADMIN_EMAIL'] = os.environ.get('ADMIN_EMAIL')
+app.config['SUPERVISOR_EMAIL'] = os.environ.get('SUPERVISOR_EMAIL')
 # --- Add your Google Client ID to the app's config ---
 app.config['GOOGLE_CLIENT_ID'] = os.getenv('GOOGLE_CLIENT_ID') # Get client ID from .env file
 
