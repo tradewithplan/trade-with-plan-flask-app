@@ -134,29 +134,35 @@ app.jinja_env.filters['format_ist'] = format_to_ist
 
 # ---------- Decorators ----------
 def login_required(f):
-    """
-    Decorate routes to require login.
-    http://flask.pocoo.org/docs/1.0/patterns/viewdecorators/
-    """
-
+    """Decorator to require login for a route."""
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if 'user_id' not in session:
             flash("You need to be logged in to access this page.", "warning")
             return redirect(url_for('login'))
         return f(*args, **kwargs)
-
     return decorated_function
 
-# --- NEW DECORATOR: Requires admin privileges ---
 def admin_required(f):
     """
-    Decorates routes to require admin status.
-    Checks for the 'is_admin' session variable.
+    CORRECTED: Decorator to require 'admin' role for actions like editing or deleting.
     """
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if not session.get('is_admin'):
+        # This check is the crucial part. It must be exactly 'admin'.
+        if session.get('role') != 'admin':
+            flash("You do not have permission to perform this action.", "error")
+            # Redirect to the dashboard, as you might be a supervisor.
+            return redirect(url_for('admin_dashboard'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+# --- NEW DECORATOR: To grant dashboard access to both Admin and Supervisor ---
+def dashboard_access_required(f):
+    """Decorator to grant dashboard access to both 'admin' and 'supervisor' roles."""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if session.get('role') not in ['admin', 'supervisor']:
             flash("You do not have permission to view this page.", "error")
             return redirect(url_for('home'))
         return f(*args, **kwargs)
@@ -330,11 +336,16 @@ def login():
                 session['user_name'] = user['fullname']
                 
                 # --- ROLE ASSIGNMENT LOGIC ---
-                if email == app.config.get('ADMIN_EMAIL'):
+
+                # --- MODIFICATION: Make email check case-insensitive ---
+                admin_email = app.config.get('ADMIN_EMAIL', '').lower()
+                supervisor_email = app.config.get('SUPERVISOR_EMAIL', '').lower()
+                
+                if email.lower() == admin_email:
                     session['role'] = 'admin'
                     flash("Admin login successful!", "success")
                     return redirect(url_for('admin_dashboard'))
-                elif email == app.config.get('SUPERVISOR_EMAIL'):
+                elif email.lower() == supervisor_email:
                     session['role'] = 'supervisor'
                     flash("Supervisor login successful!", "success")
                     return redirect(url_for('admin_dashboard'))
@@ -409,21 +420,6 @@ def auth_google():
         # Log the error for debugging
         app.logger.error(f"Error during Google authentication: {e}")
         return {"success": False, "message": "An internal error occurred."}, 500
-
-
-# --- NEW DECORATOR: To grant dashboard access to both Admin and Supervisor ---
-def dashboard_access_required(f):
-    """Decorates routes to require either 'admin' or 'supervisor' role."""
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if session.get('role') not in ['admin', 'supervisor']:
-            flash("You do not have permission to view this page.", "error")
-            return redirect(url_for('home'))
-        return f(*args, **kwargs)
-    return decorated_function
-
-
-
 
 # 5. New route to handle course purchases
 
